@@ -98,7 +98,10 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             roomHosts[roomCode].responses = {}
             io.to(roomCode).emit('game_started')
             const prompt = generatePrompt(roomCode)
-            io.to(roomCode).emit('prompt', prompt)
+
+            setTimeout(() => {
+                io.to(roomCode).emit('prompt', prompt)
+            }, 8000)
             const gptResponse = await requestGPTResponse(prompt)
             if (gptResponse) {
                 roomHosts[roomCode].responses[gptResponse] = {
