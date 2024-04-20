@@ -6,29 +6,33 @@ function Join({ api }) {
 
     return (
         <>
-            <form onSubmit={ (e) => {
+            <form 
+                className="form"
+                onSubmit={ (e) => {
                 e.preventDefault()
                 api.joinRoom(name, roomCode)
             }}>
+                <p className="input-desc">Enter name:</p>
                 <input
                     type="text"
                     id="name-input"
-                    className="input-box"
+                    className="input"
                     value={name}
                     placeholder='Name'
                     onChange={(e) => setName(e.target.value)}
                 ></input>
+                <p className="input-desc">Enter code:</p>
                 <input
                     type="text"
                     id="room-code-input"
-                    className="input-box"
+                    className="input"
                     value={roomCode}
                     placeholder='Room Code'
                     onChange={(e) => setRoomCode(e.target.value)}
                 ></input>
                 <button
                     type="submit"
-                    className="submit-button"
+                    className="button"
                 >
                     Enter
                 </button>

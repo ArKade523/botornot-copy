@@ -1,13 +1,13 @@
 function Choose({ prompt, responses, api, setMode }) {
     return (
         <>
-            <h1>{prompt}</h1>
-            <p>Who is the bot?</p>
+            <p className="medium-info">{prompt}</p>
+            <p className="small-info">Who is the bot?</p>
             {responses.map((response) => {
                 console.log(response)
                 return(
                 <button
-                    className="response"
+                    className="button"
                     key={response}
                     onClick={(e) => {
                         api.vote(response)
