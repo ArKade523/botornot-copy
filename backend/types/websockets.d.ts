@@ -34,6 +34,7 @@ export interface joinRoomValidation {
     validCode: boolean
     validName: boolean
     host: boolean
+    code: string
 }
 
 export interface displayPlayerJoin {

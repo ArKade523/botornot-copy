@@ -1,8 +1,5 @@
 import OpenAI from 'openai'
-import dotenv from 'dotenv'
 import prompts from './prompts'
-
-dotenv.config()
 
 export const requestGPTResponse = async (message: string) => {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -36,7 +33,3 @@ export const requestGPTResponse = async (message: string) => {
 
     return completion.choices[0].message.content
 }
-
-const prompt = prompts[Math.floor(Math.random() * prompts.length)]
-console.log(prompt)
-requestGPTResponse(prompt).then((response) => console.log(response))

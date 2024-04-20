@@ -11,9 +11,13 @@ export class Api {
         return this.socket
     }
 
+    setCode(code){
+        this.code = code;
+    }
+
     sendMessage(type, message) {
-        console.log('Send Message: type: ', type, ' Message: ', message)
-        this.socket.emit(type, message)
+        console.log('Send Message: type: ', type, ' Message: ', {...message, roomCode: this.code})
+        this.socket.emit(type, {...message, roomCode: this.code})
     }
 
     //PLAYER SEND METHODS
@@ -26,7 +30,7 @@ export class Api {
     }
 
     sendResponse(response) {
-        this.sendMessage('player_prompt_response', response)
+        this.sendMessage('player_prompt_response', {response})
     }
 
     vote(response) {

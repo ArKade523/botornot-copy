@@ -19,9 +19,16 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
 
     // Generate a random prompt from the list
     const generatePrompt = (roomCode: string) => {
+        console.log(`Room code used in generatePrompt: ${roomCode}`)
         let index = Math.floor(Math.random() * prompts.length)
-        while (roomHosts[roomCode].usedPrompts.includes(index)) {
-            index = Math.floor(Math.random() * prompts.length)
+
+        if (roomHosts[roomCode] && roomHosts[roomCode].usedPrompts) {
+            while (roomHosts[roomCode].usedPrompts?.includes(index)) {
+                index = Math.floor(Math.random() * prompts.length)
+            }
+        }
+        if (!roomHosts[roomCode].usedPrompts) {
+            roomHosts[roomCode].usedPrompts = []
         }
         roomHosts[roomCode].usedPrompts.push(index)
 
@@ -45,6 +52,8 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                 responses: {}
             } // Store the host's socket ID
 
+            console.log("Created roomHost[roomCode]")
+
             io.to(roomCode).emit('display_code', { code: roomCode })
 
             console.log(`Room created with code: ${roomCode}, host ID: ${socket.id}`)
@@ -63,7 +72,8 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             const responsePayload: joinRoomValidation = {
                 validCode: payload.code in roomHosts,
                 validName: payload.name !== '',
-                host: Object.keys(roomHosts[payload.code].players).length === 1 // If there is only one player in the room, they are the host
+                host: Object.keys(roomHosts[payload.code].players).length === 1, // If there is only one player in the room, they are the host
+                code: payload.code
             }
 
             if (responsePayload.host) {
@@ -83,7 +93,8 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             }
         })
 
-        socket.on('host_start_game', async (roomCode: string) => {
+        socket.on('host_start_game', async (payload: {roomCode: string}) => {
+            const roomCode = payload.roomCode
             io.to(roomCode).emit('game_started')
             const prompt = generatePrompt(roomCode)
             io.to(roomCode).emit('prompt', prompt)
@@ -133,10 +144,9 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             }
         })
 
-        socket.on('player_prompt_response', (response: string) => {
-            const roomCode = socket.rooms.values().next().value
-            roomHosts[roomCode].players[socket.id].responses.push(response)
-            roomHosts[roomCode].responses[response] = {
+        socket.on('player_prompt_response', ({response, roomCode} : {response: string, roomCode: string}) => {
+        roomHosts[roomCode].players[socket.id].responses.push(response)
+        roomHosts[roomCode].responses[response] = {
                 round: roundNum,
                 votes: 0,
                 player_id: socket.id,
@@ -148,9 +158,7 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             } as displayPromptResponse)
         })
 
-        socket.on('player_submit_vote', (response: string) => {
-            const roomCode = socket.rooms.values().next().value
-
+        socket.on('player_submit_vote', (response: string, roomCode: string) => {
             roomHosts[roomCode].responses[response].votes++
             if (roomHosts[roomCode].responses[response].isBot) {
                 roomHosts[roomCode].players[socket.id].points += 200

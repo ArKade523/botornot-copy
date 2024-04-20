@@ -9,6 +9,8 @@ export default defineConfig({
         rollupOptions: {
             input: 'src/main.jsx'
         },
-        outDir: '../dist/static'
+        outDir: '../dist/static',
+        cssMinify: false,
+        minify: false,
     }
 })

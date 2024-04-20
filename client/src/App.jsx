@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import Display from './screens/Display'
 import Introduction from './screens/Introduction'
@@ -6,11 +6,15 @@ import Submitted from './screens/Submitted'
 import Guess from './screens/Guess'
 import Awnsers from './screens/Awnsers'
 import Scores from './screens/Scores'
+import Join from './screens/Join'
+import Host from './screens/Host'
+import Enter from './screens/Enter'
+import Choose from './screens/Choose'
 import { useApi } from './hooks/useApi'
 
 function App() {
     const [mode, setMode] = useState('start')
-    const [isDisplay, setIsDisplay] = useState(false)
+    const isDisplay = useRef(false)
     const api = useApi('localhost:3000')
 
     const [code, setCode] = useState(undefined)
@@ -41,9 +45,9 @@ function App() {
         })
 
         socket.on('prompt', (res) => {
-            console.log(res)
-            setPromp(res.prompt)
-            if (isDisplay) {
+            console.log("prompt response ", res)
+            setPromp(res)
+            if (isDisplay.current) {
                 setMode('submitted')
                 setPlayers([])
             } else {
@@ -89,6 +93,8 @@ function App() {
 
         socket.on('join_room_validation', (res) => {
             console.log(res)
+            console.log(res.code);
+            api.setCode(res.code);
             setHost(res.host)
             setMode('host')
         })
@@ -122,7 +128,7 @@ function App() {
                     <button
                         onClick={() => {
                             setMode('display')
-                            setIsDisplay(true)
+                            isDisplay.current = true
                             api.createRoom()
                         }}
                     >
@@ -145,7 +151,7 @@ function App() {
             {mode === 'scores' && <Scores players={players}></Scores>}
 
             {mode === 'join' && <Join api={api}></Join>}
-            {mode === 'host' && <Host></Host>}
+            {mode === 'host' && <Host host={host} api={api}></Host>}
             {mode === 'enter' && <Enter promp={promp} api={api} setMode={setMode}></Enter>}
             {mode === 'wait' && <h1>WAIT!</h1>}
             {mode === 'choose' && (
