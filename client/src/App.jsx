@@ -81,10 +81,8 @@ function App() {
         socket.on('display_votes', (res) => {
             console.log(res)
             setMode('votes');
-            if(isDisplay){
-                setVotes(res)
+            setVotes(res)
                 //[{res.response, res.votes}]
-            }
             //Make this interactive??
         })
 
@@ -160,7 +158,8 @@ function App() {
             {mode === 'choose' && (
                 <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
             )}
-            {mode === 'votes' && <Scores players={players}></Scores>}
+            {mode === 'votes' && <Scores scores={votes.responses} host={host} api={api}>
+            </Scores>}
             {mode === 'points' && <h2>Your points {points}</h2>}
         </>
     )
