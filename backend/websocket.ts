@@ -1,6 +1,7 @@
 import { IncomingMessage, Server, ServerResponse } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
 import prompts from './prompts';
+import { requestGPTResponse } from './chatGPT';
 
 interface PlayerMap {
     [key: string]: string
@@ -90,7 +91,9 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
 
         socket.on('host_start_game', (roomCode: string) => {
             io.to(roomCode).emit('game_started')
-            io.to(roomCode).emit('prompt', generatePrompt(roomCode))
+            const prompt = generatePrompt(roomCode)
+            io.to(roomCode).emit('prompt', prompt)
+            const gptResponse = requestGPTResponse(prompt)
             setTimeout(() => {
                 io.to(roomCode).emit('display_reveal_responses', Object.keys(roomHosts[roomCode].responses))
                 io.to(roomCode).emit('player_reveal_responses', Object.keys(roomHosts[roomCode].responses))
