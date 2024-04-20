@@ -111,10 +111,9 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             if (roundNum < numRounds) {
                 io.to(roomCode).emit('start_timer', { duration: 60 })
                 setTimeout(() => {
-                    io.to(roomCode).emit('display_reveal_responses', { bot_response: gptResponse })
                     io.to(roomCode).emit(
                         'player_reveal_responses',
-                        Object.keys(roomHosts[roomCode].responses)
+                        { responses: [...Object.keys(roomHosts[roomCode].responses), gptResponse] }
                     )
 
                     io.to(roomCode).emit('start_timer', { duration: 60 })
