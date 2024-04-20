@@ -119,16 +119,19 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
 
                     io.to(roomCode).emit('start_timer', { duration: 60 })
                     setTimeout(() => {
-                        let responseArray: { response: string, votes: number, player: string }[] = [];
+                        let responseArray: { response: string, votes: number, player: string, lastRound: boolean }[] = [];
 
                         // Extracting data from the responses object
                         for (const [response, details] of Object.entries(roomHosts[roomCode].responses)) {
                             const playerID = roomHosts[roomCode].responses[response].player_id
+                            console.log(roundNum)
+                            console.log(numRounds)
 
                             responseArray.push({
                                 response: response,
                                 votes: details.votes,
-                                player: playerID === "0" ? "Robot" : roomHosts[roomCode].players[playerID].name
+                                player: playerID === "0" ? "Robot" : roomHosts[roomCode].players[playerID].name,
+                                lastRound: roundNum + 1 >= numRounds
                             });
                         }
 
@@ -186,7 +189,8 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                 const responsesObject = roomHosts[roomCode].responses
                 const responsesArray = Object.keys(responsesObject).map((key) => ({
                     response: key,
-                    votes: responsesObject[key].votes
+                    votes: responsesObject[key].votes,
+                    lastRound: roundNum + 1 === numRounds
                 }))
 
                 io.to(roomCode).emit('display_votes', { responses: responsesArray })
@@ -197,6 +201,25 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                     })
                 }
             }
+        })
+
+        socket.on('finish', async (payload: {roomCode: string}) => {
+            const roomCode = payload.roomCode
+            let playerScores: { player: string; points: number }[] = []
+
+                for (const playerKey in roomHosts[roomCode].players) {
+                    const player = roomHosts[roomCode].players[playerKey]
+                    playerScores.push({ player: player.name, points: player.points })
+
+                    // Send the final scores to the players
+                    io.to(player.id).emit('player_final_score', {
+                        points: player.points
+                    })
+                }
+
+                io.to(roomCode).emit('display_final_scores', {
+                    players: playerScores
+                })
         })
 
         socket.on('disconnect', () => {

@@ -1,6 +1,8 @@
 function Scores({ scores, host, api }) {
     console.log("----");
     console.log(scores);
+    const lastRound = scores[0].lastRound;
+
     return (
         <>
         {scores !== undefined &&
@@ -16,9 +18,12 @@ function Scores({ scores, host, api }) {
                     </div>
                 </div>)
         })}
-        {host && <button
+        {lastRound ? <button
                 className="button"
-                onClick={() => api.hostStartGame()}>Next Round</button>}
+                onClick={() => api.finish()}>Finish Game</button>: (host && <button
+                className="button"
+                onClick={() => api.hostStartGame()}>Next Round</button>)}
+        
     </>
     )
 }

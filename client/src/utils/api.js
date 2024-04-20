@@ -37,6 +37,10 @@ export class Api {
         this.sendMessage('player_submit_vote', {response})
     }
 
+    finish(){
+        this.sendMessage('finish', {})
+    }
+
     //DISPLAY METHODS
     createRoom() {
         this.sendMessage('create_room')
