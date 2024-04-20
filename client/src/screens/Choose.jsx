@@ -4,7 +4,7 @@ function Choose({ prompt, responses, api, setMode }) {
             <h1>{prompt}</h1>
             <p>Who is the bot?</p>
             {responses.map((response) => {
-                ;<button
+                <button
                     className="response"
                     onClick={(e) => {
                         api.vote(e.target.value)

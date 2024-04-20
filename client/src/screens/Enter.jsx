@@ -10,7 +10,7 @@ function Enter({ promp, api, setMode }) {
                 onSubmit={(e) => {
                     e.preventDefault()
                     api.sendResponse(response)
-                    setMode('wait')
+                    setMode('wait');
                     }}>
                 <input
                     type="text"

@@ -2,7 +2,7 @@ function Players({ players }) {
     return (
         <>
             {players.map((player) => {
-                ;<div className="player-tile">
+                <div className="player-tile">
                     <p>{player.player}</p>
                     <p>{player.score ?? ''}</p>
                 </div>

@@ -122,8 +122,8 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                         io.to(roomCode).emit('display_votes', {
                             responses: roomHosts[roomCode].responses
                         })
-                    }, 60000)
-                }, 60000)
+                    }, 15000)
+                }, 15000)
                 roundNum++
             } else {
                 let playerScores: { player: string; points: number }[] = []

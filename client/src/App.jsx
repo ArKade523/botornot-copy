@@ -27,7 +27,7 @@ function App() {
     const [points, setPoints] = useState(0)
 
     useEffect(() => {
-        socket = api.getSocket()
+        const socket = api.getSocket()
 
         socket.on('display_code', (res) => {
             console.log(res.code)
@@ -62,21 +62,27 @@ function App() {
 
         socket.on('display_prompt_response', (res) => {
             console.log(res)
-            setPlayers((players, res) => {
-                ;[...players, { player: res.player, response: res.response }]
-            })
+            if(isDisplay.current){
+                setPlayers((players) => {
+                    [...players, { player: res.player, response: res.response }]
+                })
+            }
         })
 
         socket.on('display_reveal_responses', (res) => {
-            console.log(res)
-            setMode('guess')
-            setPlayers((players, res) => {
-                ;[...players, { player: bot, response: res.bot_response }]
+            console.log(res.bot_response)
+            setPlayers((players) => {
+                [...players, { player: 'bot ', response: res.bot_response}]
             })
+            setMode('guess')
         })
 
         socket.on('display_votes', (res) => {
             console.log(res)
+            if(isDisplay){
+                setVotes(res);
+                //[{res.response, res.votes}]
+            }
             //Make this interactive??
         })
 
