@@ -113,7 +113,7 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                 setTimeout(() => {
                     io.to(roomCode).emit(
                         'player_reveal_responses',
-                        { responses: [...Object.keys(roomHosts[roomCode].responses), gptResponse] }
+                        [...Object.keys(roomHosts[roomCode].responses), gptResponse]
                     )
 
                     io.to(roomCode).emit('start_timer', { duration: 60 })
