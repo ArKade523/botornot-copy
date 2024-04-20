@@ -29,7 +29,7 @@ export class Api {
         this.sendMessage('player_prompt_response', response)
     }
 
-    vote(response){
+    vote(response) {
         this.sendMessage('player_submit_vote', response)
     }
 

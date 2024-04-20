@@ -10,17 +10,17 @@ import { useApi } from './hooks/useApi'
 
 function App() {
     const [mode, setMode] = useState('start')
-    const [isDisplay, setIsDisplay] = useState(false);
+    const [isDisplay, setIsDisplay] = useState(false)
     const api = useApi('localhost:3000')
 
     const [code, setCode] = useState(undefined)
     const [players, setPlayers] = useState([])
-    const [responses, setResponses] = useState([]);
+    const [responses, setResponses] = useState([])
     const [host, setHost] = useState(false)
     const [promp, setPromp] = useState('')
     const [votes, setVotes] = useState([])
     const [scores, setScores] = useState([])
-    const [points, setPoints] = useState(0);
+    const [points, setPoints] = useState(0)
 
     useEffect(() => {
         socket = api.getSocket()
@@ -43,11 +43,11 @@ function App() {
         socket.on('prompt', (res) => {
             console.log(res)
             setPromp(res.prompt)
-            if(isDisplay){
-              setMode('submitted')
-              setPlayers([])
-            }else{
-              setMode('enter')
+            if (isDisplay) {
+                setMode('submitted')
+                setPlayers([])
+            } else {
+                setMode('enter')
             }
         })
 
@@ -84,34 +84,32 @@ function App() {
 
         //Player Screen
         socket.on('join_room', (res) => {
-          console.log(res)
+            console.log(res)
         })
 
         socket.on('join_room_validation', (res) => {
-          console.log(res)
-          setHost(res.host);
-          setMode('host');
+            console.log(res)
+            setHost(res.host)
+            setMode('host')
         })
 
         socket.on('player_reveal_responses', (res) => {
-          console.log(res)
-          setMode('choose')
-          setResponses(res)
+            console.log(res)
+            setMode('choose')
+            setResponses(res)
         })
 
         socket.on('player_points', (res) => {
-          console.log(res)
-          setMode('points')
-          setPoints((points) => points + res.points)
+            console.log(res)
+            setMode('points')
+            setPoints((points) => points + res.points)
         })
 
         socket.on('display_final_scores', (res) => {
-          console.log(res)
-          setMode('scores')
-          setScores(res)
+            console.log(res)
+            setMode('scores')
+            setScores(res)
         })
-      
-
     }, [])
 
     return (
@@ -124,12 +122,19 @@ function App() {
                     <button
                         onClick={() => {
                             setMode('display')
-                            setIsDisplay(true);
+                            setIsDisplay(true)
                             api.createRoom()
-                        }}>
+                        }}
+                    >
                         Create Game
                     </button>
-                    <button onClick={() => {setMode('join')}}>Join Game</button>
+                    <button
+                        onClick={() => {
+                            setMode('join')
+                        }}
+                    >
+                        Join Game
+                    </button>
                 </div>
             )}
             {mode === 'display' && <Display code={code} players={players}></Display>}
@@ -143,9 +148,10 @@ function App() {
             {mode === 'host' && <Host></Host>}
             {mode === 'enter' && <Enter promp={promp} api={api} setMode={setMode}></Enter>}
             {mode === 'wait' && <h1>WAIT!</h1>}
-            {mode === 'choose' && <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>}
+            {mode === 'choose' && (
+                <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
+            )}
             {mode === 'points' && <h2>Your points {points}</h2>}
-
         </>
     )
 }

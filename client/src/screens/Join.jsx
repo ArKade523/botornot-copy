@@ -20,7 +20,13 @@ function Join({ api }) {
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value)}
             ></input>
-            <button type="button" className="submit-button" onClick={() => {api.joinRoom(name, code)}}>
+            <button
+                type="button"
+                className="submit-button"
+                onClick={() => {
+                    api.joinRoom(name, code)
+                }}
+            >
                 Enter
             </button>
         </>
