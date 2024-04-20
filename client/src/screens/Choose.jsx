@@ -10,7 +10,7 @@ function Choose({ prompt, responses, api, setMode }) {
                     className="response"
                     key={response}
                     onClick={(e) => {
-                        api.vote(e.target.value)
+                        api.vote(response)
                         setMode('wait')
                     }}
                 >
