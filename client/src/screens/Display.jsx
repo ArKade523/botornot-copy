@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import Input from './components/Input'
-import Responses from './components/Responses';
-import useApi from './utils/api';
+import Input from '../components/Input'
+import Responses from '../components/Responses';
+import useApi from '../utils/api';
 
 function Display() {
   const api = useApi('localhost:3000');
