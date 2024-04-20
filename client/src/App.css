@@ -299,6 +299,7 @@ html, body {
     text-align: center;
     background-color: #1D2638;
     border-radius: 6px;
+    font-size: 1.3rem;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;

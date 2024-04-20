@@ -14,7 +14,8 @@ export const requestGPTResponse = async (message: string) => {
         'Sound like a pirate',
         'Sound like Shakespeare',
         'Answer with exactly one word, all lowercase',
-        'Sound like an inmate'
+        'Sound like an inmate',
+        'Sound like you are a duck pretending to be a human',
     ]
 
     const tone = tones[Math.floor(Math.random() * tones.length)]
