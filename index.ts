@@ -2,8 +2,8 @@ import express from 'express'
 import path from 'path'
 import { engine } from 'express-handlebars'
 import fs from 'fs'
-import bodyParser from 'body-parser'
 import dotenv from 'dotenv'
+import bodyParser from 'body-parser'
 dotenv.config()
 
 const DEBUG = process.env.NODE_ENV !== 'production'
