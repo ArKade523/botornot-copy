@@ -122,11 +122,10 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
 
                         // Extracting data from the responses object
                         for (const [response, details] of Object.entries(roomHosts[roomCode].responses)) {
-                            if (details.round === roundNum)
-                                responseArray.push({
-                                    response: response,
-                                    votes: details.votes
-                                });
+                            responseArray.push({
+                                response: response,
+                                votes: details.votes
+                            });
                         }
 
                         io.to(roomCode).emit('display_votes', {
@@ -169,6 +168,8 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
         })
 
         socket.on('player_submit_vote', ({response, roomCode} : {response: string, roomCode: string}) => {
+            console.log(roomHosts[roomCode].responses)
+
             roomHosts[roomCode].responses[response].votes++
             if (roomHosts[roomCode].responses[response].isBot) {
                 roomHosts[roomCode].players[socket.id].points += 200
