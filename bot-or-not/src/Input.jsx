@@ -1,12 +1,13 @@
 import { useState } from 'react'
 
 function Input({ operation }) {
-    const [input, setInput] = useState('');
-
+    const [name, setName] = useState('');
+    const [roomCode, setRoomCode] = useState('');
 
   return (
     <>
-        <input type='text' className='input-box' value={input} onChange={e => setInput(e.target.value)}></input>
+        {(operation!=='display') && <input type='text' id='name-input' className='input-box' value={name} onChange={e => setName(e.target.value)}></input>}
+        <input type='text' id='room-code-input' className='input-box' value={roomCode} onChange={e => setRoomCode(e.target.value)}></input>
         <button type='button' className='submit-button' onClick={() => {
 
         }}>{operation}</button>
