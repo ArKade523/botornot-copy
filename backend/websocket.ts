@@ -102,6 +102,7 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             setTimeout(() => {
                 io.to(roomCode).emit('prompt', prompt)
             }, 8000)
+
             const gptResponse = await requestGPTResponse(prompt)
             if (gptResponse) {
                 roomHosts[roomCode].responses[gptResponse] = {
@@ -135,8 +136,8 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                         io.to(roomCode).emit('display_votes', {
                             responses: responseArray
                         })
-                    }, 15000)
-                }, 15000)
+                    }, 20000)
+                }, 38000)
                 roundNum++
             } else {
                 let playerScores: { player: string; points: number }[] = []

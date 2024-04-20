@@ -57,11 +57,6 @@ function App() {
             }
         })
 
-        socket.on('start_timer', () => {
-            console.log('Start Timer')
-            //Start a timer
-        })
-
         // socket.on('display_prompt_response', (res) => {
         //     console.log(res)
         //     setPlayers(
@@ -118,6 +113,23 @@ function App() {
             setMode('points')
             setPoints((points) => points + res.points)
         })
+
+        return () => {
+            socket.off('display_code')
+            socket.off('display_player_join')
+            socket.off('game_started')
+            socket.off('prompt')
+            socket.off('start_timer_reveal_responses')
+            socket.off('start_timer_display_votes')
+            socket.off('display_prompt_response')
+            socket.off('display_reveal_responses')
+            socket.off('display_votes')
+            socket.off('display_final_scores')
+            socket.off('join_room')
+            socket.off('join_room_validation')
+            socket.off('player_reveal_responses')
+            socket.off('player_points')
+        }
 
     }, [])
 
