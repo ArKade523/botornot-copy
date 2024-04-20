@@ -34,7 +34,7 @@ export class Api {
     }
 
     vote(response) {
-        this.sendMessage('player_submit_vote', response)
+        this.sendMessage('player_submit_vote', {response})
     }
 
     //DISPLAY METHODS
