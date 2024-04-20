@@ -53,10 +53,12 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             while (roomCode in roomHosts) {
                 roomCode = Math.random().toString(36).toUpperCase().slice(2, 6)
             }
+            console.log(roomCode)
+
             socket.join(roomCode)
             roomHosts[roomCode] = { displayID: socket.id, players: {}, usedPrompts: [], responses: {} } // Store the host's socket ID
 
-            io.to(socket.id).emit('display_code', { code: roomCode })
+            io.to(roomCode).emit('display_code', { code: roomCode })
 
             console.log(`Room created with code: ${roomCode}, host ID: ${socket.id}`)
         })

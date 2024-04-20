@@ -1,13 +1,13 @@
 import { io } from 'socket.io-client';
+import { createContext } from 'react';
 
-
-class useApi {
+export class Api {
     constructor(url){
         console.log("Constructor");
-        this.socket = io(url);
+        this.socket = io(url ? url : null);
     };
 
-    socket(){
+    getSocket(){
         return this.socket;
     }
 
@@ -37,4 +37,4 @@ class useApi {
 
 }
 
-export default useApi
+export const ApiContext = createContext();
