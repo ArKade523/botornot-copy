@@ -47,6 +47,13 @@ sequenceDiagram
 
 # Message structures
 
+Create room
+``` json
+{
+    type: "create_room"
+}
+```
+
 Display code 
 ``` json
 {
