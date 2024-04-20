@@ -10,6 +10,7 @@ import Join from './screens/Join'
 import Host from './screens/Host'
 import Enter from './screens/Enter'
 import Choose from './screens/Choose'
+import Points from './screens/Points'
 import { useApi } from './hooks/useApi'
 
 import logo_image from './../../images/logo.svg'
@@ -26,7 +27,7 @@ function App() {
     const [promp, setPromp] = useState('')
     const [votes, setVotes] = useState([])
     const [scores, setScores] = useState([])
-    const [points, setPoints] = useState(0)
+    const [points, setPoints] = useState([])
 
     useEffect(() => {
         const socket = api.getSocket()
@@ -62,24 +63,6 @@ function App() {
             //Start a timer
         })
 
-        // socket.on('display_prompt_response', (res) => {
-        //     console.log(res)
-        //     setPlayers(
-        //         [...players, { player: res.player, response: res.response }]
-        //     )
-        //     console.log("prompt_response", players)
-        // })
-
-        // socket.on('display_reveal_responses', (res) => {
-        //     console.log(res.bot_response)
-        //     console.log("Players, ", players)
-        //     setPlayers(
-        //         [...players, { player: 'bot ', response: res.bot_response}]
-        //     )
-        //     console.log(players)
-        //     setMode('guess')
-        // })
-
         socket.on('display_votes', (res) => {
             console.log(res)
             setMode('votes');
@@ -90,8 +73,10 @@ function App() {
 
         socket.on('display_final_scores', (res) => {
             console.log(res)
-            setMode('scores')
-            setScores(res)
+            setMode('points')
+            if(isDisplay.current){
+                setPoints(res)
+            }
         })
 
         //Player Screen
@@ -113,10 +98,12 @@ function App() {
             setResponses(res)
         })
 
-        socket.on('player_points', (res) => {
+        socket.on('player_final_scores', (res) => {
             console.log(res)
             setMode('points')
-            setPoints((points) => points + res.points)
+            if(!isDisplay.current){
+                setPoints(res)
+            }
         })
 
     }, [])
@@ -168,7 +155,7 @@ function App() {
                     <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
                 )}
                 {mode === 'votes' && <Scores host={host} api={api} scores={votes.responses}></Scores>}
-                {mode === 'points' && <h2>Your points {points}</h2>}
+                {mode === 'points' && <Points players={points.players}></Points>}
             </div>
         </>
     )
