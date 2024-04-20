@@ -12,6 +12,8 @@ import Enter from './screens/Enter'
 import Choose from './screens/Choose'
 import { useApi } from './hooks/useApi'
 
+import logo_image from './../../images/logo.svg'
+
 function App() {
     const [mode, setMode] = useState('start')
     const isDisplay = useRef(false)
@@ -120,44 +122,51 @@ function App() {
 
     return (
         <>
-            <div id="logo-div">
-                <h1>Bot or Not</h1>
-            </div>
-            {mode === 'start' && (
-                <div className="choose-display">
-                    <button
-                        onClick={() => {
-                            setMode('display')
-                            isDisplay.current = true
-                            api.createRoom()
-                        }}
-                    >
-                        Create Game
-                    </button>
-                    <button
-                        onClick={() => {
-                            setMode('join')
-                        }}
-                    >
-                        Join Game
-                    </button>
+            <div className="header">
+                <div id="logo-div" className="logo-box">
+                    <img className="logo-img" src={logo_image} />
+                    <h1 className="logo-h1">Bot or Not</h1>
                 </div>
-            )}
-            {mode === 'display' && <Display code={code} players={players}></Display>}
-            {mode === 'introduction' && <Introduction></Introduction>}
-            {mode === 'submitted' && <Submitted prompt={promp} players={players}></Submitted>}
-            {mode === 'guess' && <Guess prompt={promp} players={players}></Guess>}
-            {mode === 'awnsers' && <Awnsers prompt={promp} players={players}></Awnsers>}
-            {mode === 'scores' && <Scores players={players}></Scores>}
+            </div>
+            <div className="content home-content">
+                {mode === 'start' && (
+                    <>
+                        <button
+                            onClick={() => {
+                                setMode('display')
+                                isDisplay.current = true
+                                api.createRoom()
+                            }}
+                            className="button"
+                        >
+                            Create Game
+                        </button>
+                        <button
+                            onClick={() => {
+                                setMode('join')
+                            }}
+                            className="button"
+                        >
+                            Join Game
+                        </button>
+                    </>
+                )}
+                {mode === 'display' && <Display code={code} players={players}></Display>}
+                {mode === 'introduction' && <Introduction></Introduction>}
+                {mode === 'submitted' && <Submitted prompt={promp} players={players}></Submitted>}
+                {mode === 'guess' && <Guess prompt={promp} players={players}></Guess>}
+                {mode === 'awnsers' && <Awnsers prompt={promp} players={players}></Awnsers>}
+                {mode === 'scores' && <Scores players={players}></Scores>}
 
-            {mode === 'join' && <Join api={api}></Join>}
-            {mode === 'host' && <Host host={host} api={api}></Host>}
-            {mode === 'enter' && <Enter promp={promp} api={api} setMode={setMode}></Enter>}
-            {mode === 'wait' && <h1>WAIT!</h1>}
-            {mode === 'choose' && (
-                <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
-            )}
-            {mode === 'points' && <h2>Your points {points}</h2>}
+                {mode === 'join' && <Join api={api}></Join>}
+                {mode === 'host' && <Host host={host} api={api}></Host>}
+                {mode === 'enter' && <Enter promp={promp} api={api} setMode={setMode}></Enter>}
+                {mode === 'wait' && <h1>WAIT!</h1>}
+                {mode === 'choose' && (
+                    <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
+                )}
+                {mode === 'points' && <h2>Your points {points}</h2>}
+            </div>
         </>
     )
 }
