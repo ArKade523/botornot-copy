@@ -1,10 +1,15 @@
-import Scoreboard from '../components/Scoreboard'
-
-function Scores({ players }) {
+function Scores({ scores }) {
     return (
         <>
-            <Scoreboard score={players}></Scoreboard>
-        </>
+        {scores !== undefined &&
+            scores.map((score) => {
+                return(
+                <div className="score-box">
+                    <div className="response">{score.response}</div>
+                    <div className="score">{score.votes}</div>
+                </div>)
+        })}
+    </>
     )
 }
 export default Scores

@@ -60,27 +60,29 @@ function App() {
             //Start a timer
         })
 
-        socket.on('display_prompt_response', (res) => {
-            console.log(res)
-            if(isDisplay.current){
-                setPlayers((players) => {
-                    [...players, { player: res.player, response: res.response }]
-                })
-            }
-        })
+        // socket.on('display_prompt_response', (res) => {
+        //     console.log(res)
+        //     setPlayers(
+        //         [...players, { player: res.player, response: res.response }]
+        //     )
+        //     console.log("prompt_response", players)
+        // })
 
-        socket.on('display_reveal_responses', (res) => {
-            console.log(res.bot_response)
-            setPlayers((players) => {
-                [...players, { player: 'bot ', response: res.bot_response}]
-            })
-            setMode('guess')
-        })
+        // socket.on('display_reveal_responses', (res) => {
+        //     console.log(res.bot_response)
+        //     console.log("Players, ", players)
+        //     setPlayers(
+        //         [...players, { player: 'bot ', response: res.bot_response}]
+        //     )
+        //     console.log(players)
+        //     setMode('guess')
+        // })
 
         socket.on('display_votes', (res) => {
             console.log(res)
+            setMode('votes');
             if(isDisplay){
-                setVotes(res);
+                setVotes(res)
                 //[{res.response, res.votes}]
             }
             //Make this interactive??
@@ -117,11 +119,6 @@ function App() {
             setPoints((points) => points + res.points)
         })
 
-        socket.on('display_final_scores', (res) => {
-            console.log(res)
-            setMode('scores')
-            setScores(res)
-        })
     }, [])
 
     return (
@@ -152,7 +149,7 @@ function App() {
             {mode === 'display' && <Display code={code} players={players}></Display>}
             {mode === 'introduction' && <Introduction></Introduction>}
             {mode === 'submitted' && <Submitted prompt={promp} players={players}></Submitted>}
-            {mode === 'guess' && <Guess prompt={promp} players={players}></Guess>}
+            {/* {mode === 'guess' && <Guess prompt={promp} players={players}></Guess>} */}
             {mode === 'awnsers' && <Awnsers prompt={promp} players={players}></Awnsers>}
             {mode === 'scores' && <Scores players={players}></Scores>}
 
@@ -163,6 +160,7 @@ function App() {
             {mode === 'choose' && (
                 <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
             )}
+            {mode === 'votes' && <Scores players={players}></Scores>}
             {mode === 'points' && <h2>Your points {points}</h2>}
         </>
     )
