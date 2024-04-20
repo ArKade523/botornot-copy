@@ -119,8 +119,19 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
 
                     io.to(roomCode).emit('start_timer', { duration: 60 })
                     setTimeout(() => {
+                        let responseArray: { response: string, votes: number }[] = [];
+
+                        // Extracting data from the responses object
+                        for (const [response, details] of Object.entries(roomHosts[roomCode].responses)) {
+                            if (details.round === roundNum)
+                                responseArray.push({
+                                    response: response,
+                                    votes: details.votes
+                                });
+                        }
+
                         io.to(roomCode).emit('display_votes', {
-                            responses: roomHosts[roomCode].responses
+                            responses: responseArray
                         })
                     }, 15000)
                 }, 15000)
@@ -145,14 +156,14 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
         })
 
         socket.on('player_prompt_response', ({response, roomCode} : {response: string, roomCode: string}) => {
-        roomHosts[roomCode].players[socket.id].responses.push(response)
-        roomHosts[roomCode].responses[response] = {
+            roomHosts[roomCode].players[socket.id].responses.push(response)
+            roomHosts[roomCode].responses[response] = {
                 round: roundNum,
                 votes: 0,
                 player_id: socket.id,
                 isBot: false
             }
-            socket.emit('display_prompt_response', {
+            io.to(roomCode).emit('display_prompt_response', {
                 player: roomHosts[roomCode].players[socket.id].name,
                 response
             } as displayPromptResponse)
