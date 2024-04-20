@@ -193,6 +193,15 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
 
             roomHosts[roomCode].responses[response].votes++
             if (roomHosts[roomCode].responses[response].isBot) {
+                if (!roomHosts[roomCode].players[socket.id]) {
+                    roomHosts[roomCode].players[socket.id] = {
+                        name: '',
+                        id: socket.id,
+                        host: false,
+                        responses: [],
+                        points: 0
+                    }
+                }
                 roomHosts[roomCode].players[socket.id].points += 200
             } else {
                 roomHosts[roomCode].players[
