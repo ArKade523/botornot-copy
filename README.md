@@ -5,7 +5,7 @@ sequenceDiagram
     participant Display
     participant Server
     participant Player
-    
+
     Display ->> Server: Initialize connection
     Display ->> Server: Create room
     Note over Server: Creates code
