@@ -4,8 +4,8 @@ function Submitted({ prompt, players }) {
     //need to implement icon players moving up when they have submitted their responses
     return (
         <>
-            <div className="timer">this is a timer</div>
-            <h2 className="prompt">{prompt}</h2>
+            <p className="small-info">this is a timer</p>
+            <p className="medium-info">{prompt}</p>
             <Players players={players ? players : []}></Players>
         </>
     )

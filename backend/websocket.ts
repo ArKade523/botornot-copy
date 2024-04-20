@@ -95,6 +95,7 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
 
         socket.on('host_start_game', async (payload: {roomCode: string}) => {
             const roomCode = payload.roomCode
+            roomHosts[roomCode].responses = {}
             io.to(roomCode).emit('game_started')
             const prompt = generatePrompt(roomCode)
             io.to(roomCode).emit('prompt', prompt)
