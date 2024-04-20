@@ -5,21 +5,22 @@ function Enter({ promp, api, setMode }) {
 
     return (
         <>
-            <h2>{promp}</h2>
+            <p className="medium-info">{promp}</p>
             <form
+                className="form"
                 onSubmit={(e) => {
                     e.preventDefault()
                     api.sendResponse(response)
                     setMode('wait');
                     }}>
-                <input
-                    type="text"
+                <textarea
                     placeholder="Enter response here"
+                    className="input textarea"
                     value={response}
                     onChange={(e) => setResponse(e.target.value)}
                 >
-                </input>
-                <button type='submit'>Submit</button>
+                </textarea>
+                <button type='submit' className="button">Submit</button>
             </form>
         </>
     )

@@ -88,6 +88,7 @@ html, body {
     width: calc(100% - 50px);
     margin-bottom: 40px;
     padding: 14px 20px;
+    color: #FFF;
 }
 
 .input:active, .input:focus {
@@ -106,8 +107,16 @@ html, body {
     }
 }
 
+.form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .textarea {
     height: 100px;
+    color: #FFF;
 }
 
 .small-info {
@@ -124,6 +133,10 @@ html, body {
     line-height: 30px;
     margin-bottom: 40px;
     text-align: center;
+}
+
+.medium-info:last-of-type {
+    margin-bottom: 80px;
 }
 
 .large-info {
