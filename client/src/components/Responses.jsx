@@ -1,4 +1,5 @@
 function Responses({ players }) {
+    console.log(players)
     return (
         <>
             {players.map((player) => {

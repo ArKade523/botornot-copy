@@ -119,13 +119,16 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
 
                     io.to(roomCode).emit('start_timer', { duration: 60 })
                     setTimeout(() => {
-                        let responseArray: { response: string, votes: number }[] = [];
+                        let responseArray: { response: string, votes: number, player: string }[] = [];
 
                         // Extracting data from the responses object
                         for (const [response, details] of Object.entries(roomHosts[roomCode].responses)) {
+                            const playerID = roomHosts[roomCode].responses[response].player_id
+
                             responseArray.push({
                                 response: response,
-                                votes: details.votes
+                                votes: details.votes,
+                                player: playerID === "0" ? "Robot" : roomHosts[roomCode].players[playerID].name
                             });
                         }
 
