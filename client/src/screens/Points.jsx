@@ -1,6 +1,7 @@
 function Points({ players }) {
     return (
         <>
+        <p>Thanks for playing</p>
         {players !== undefined &&
             players.map((player) => {
                 return(
