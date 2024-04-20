@@ -153,23 +153,24 @@ function App() {
                             Join Game
                         </button>
                     </>
-            )}
-            {mode === 'display' && <Display code={code} players={players}></Display>}
-            {mode === 'introduction' && <Introduction></Introduction>}
-            {mode === 'submitted' && <Submitted prompt={promp} players={players}></Submitted>}
-            {/* {mode === 'guess' && <Guess prompt={promp} players={players}></Guess>} */}
-            {mode === 'awnsers' && <Awnsers prompt={promp} players={players}></Awnsers>}
-            {mode === 'scores' && <Scores players={players}></Scores>}
+                )}
+                {mode === 'display' && <Display code={code} players={players}></Display>}
+                {mode === 'introduction' && <Introduction></Introduction>}
+                {mode === 'submitted' && <Submitted prompt={promp} players={players}></Submitted>}
+                {/* {mode === 'guess' && <Guess prompt={promp} players={players}></Guess>} */}
+                {mode === 'awnsers' && <Awnsers prompt={promp} players={players}></Awnsers>}
+                {mode === 'scores' && <Scores players={players}></Scores>}
 
-            {mode === 'join' && <Join api={api}></Join>}
-            {mode === 'host' && <Host host={host} api={api}></Host>}
-            {mode === 'enter' && <Enter promp={promp} api={api} setMode={setMode}></Enter>}
-            {mode === 'wait' && <h1>WAIT!</h1>}
-            {mode === 'choose' && (
-                <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
-            )}
-            {mode === 'votes' && <Scores players={players}></Scores>}
-            {mode === 'points' && <h2>Your points {points}</h2>}
+                {mode === 'join' && <Join api={api}></Join>}
+                {mode === 'host' && <Host host={host} api={api}></Host>}
+                {mode === 'enter' && <Enter promp={promp} api={api} setMode={setMode}></Enter>}
+                {mode === 'wait' && <h1>WAIT!</h1>}
+                {mode === 'choose' && (
+                    <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
+                )}
+                {mode === 'votes' && <Scores players={players}></Scores>}
+                {mode === 'points' && <h2>Your points {points}</h2>}
+            </div>
         </>
     )
 }
