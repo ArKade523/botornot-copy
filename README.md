@@ -7,24 +7,25 @@ sequenceDiagram
     participant Player
     
     Display ->> Server: Initialize connection
+    Display ->> Server: Create room
     Note over Server: Creates code
     Server ->> Display: Display code
     loop Every Player
         Player ->> Server: Initialize connection
-        Player ->> Server: Join code
-        Server ->> Player: Join code validation
+        Player ->> Server: Join room
+        Server ->> Player: Join room validation
         Server ->> Display: Display player join
     end
     Player ->> Server: (Host only) Host start game
-    Server ->> Display: Display start game
-    Server ->> Player: Player start game
+    Server ->> Display: Start game
+    Server ->> Player: Start game
     loop Every Round
         Note over Server : Create Prompt
-        Server ->> Display: Display prompt
-        Server ->> Player: Player prompt
+        Server ->> Display: Prompt
+        Server ->> Player: Prompt
         Note over Server: Start timer
-        Server ->> Display: Display start timer
-        Server ->> Player: Player start timer
+        Server ->> Display: Start timer
+        Server ->> Player: Start timer
         Note over Server: Get bot response from ChatGPT
         Player ->> Server: Player prompt response
         Server ->> Display: Display prompt response
@@ -56,10 +57,10 @@ Display code
 }
 ```
 
-Join code
+Join room
 ``` json
 {
-    type: "join_code",
+    type: "join_room",
     message: {
         code: "1A2B",
         name: "Johnny"
@@ -67,10 +68,10 @@ Join code
 }
 ```
 
-Join code validation
+Join room validation
 ``` json
 {
-    type: "join_code_validation",
+    type: "join_room_validation",
     message: {
         validCode: true,
         validName: true,
@@ -97,51 +98,27 @@ Host start game
 }
 ```
 
-Display start game
+Start game
 ``` json
 {
-    type: "display_start_game"
+    type: "start_game"
 }
 ```
 
-Player start game
+Prompt
 ``` json
 {
-    type: "player_start_game"
-}
-```
-
-Display prompt
-``` json
-{
-    type: "display_prompt",
+    type: "prompt",
     message: {
         prompt: "Here is a prompt"
     }
 }
 ```
 
-Player prompt
+Start timer
 ``` json
 {
-    type: "player_prompt",
-    message: {
-        prompt: "Here is a prompt"
-    }
-}
-```
-
-Display start timer
-``` json
-{
-    type: "display_start_timer"
-}
-```
-
-Player start timer
-``` json
-{
-    type: "player_start_timer"
+    type: "start_timer"
 }
 ```
 
@@ -192,7 +169,7 @@ Player reveal responses
 Player submit vote
 ``` json
 {
-    type: "player_submit vote",
+    type: "player_submit_vote",
     message: {
         response: "Here is a response"
     }
