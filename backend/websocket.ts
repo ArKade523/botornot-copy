@@ -1,13 +1,18 @@
 import { IncomingMessage, Server, ServerResponse } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
-import prompts from './prompts';
+import prompts from './prompts'
 
 interface PlayerMap {
     [key: string]: string
 }
 
 interface RoomMap {
-    [key: string]: { displayID: string; players: PlayerMap, usedPrompts: number[], responses: responseVotes }
+    [key: string]: {
+        displayID: string
+        players: PlayerMap
+        usedPrompts: number[]
+        responses: responseVotes
+    }
 }
 
 interface joinRoomPayload {
@@ -41,7 +46,7 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             index = Math.floor(Math.random() * prompts.length)
         }
         roomHosts[roomCode].usedPrompts.push(index)
-    
+
         return prompts[index]
     }
 
@@ -56,7 +61,12 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             console.log(roomCode)
 
             socket.join(roomCode)
-            roomHosts[roomCode] = { displayID: socket.id, players: {}, usedPrompts: [], responses: {} } // Store the host's socket ID
+            roomHosts[roomCode] = {
+                displayID: socket.id,
+                players: {},
+                usedPrompts: [],
+                responses: {}
+            } // Store the host's socket ID
 
             io.to(roomCode).emit('display_code', { code: roomCode })
 
@@ -81,21 +91,27 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                 }
 
                 io.to(roomHosts[payload.code].displayID).emit('display_player_join', displayPayload)
-                
+
                 console.log(`Player ${socket.id} joined room: ${payload.code}`)
             }
-
         })
-
 
         socket.on('host_start_game', (roomCode: string) => {
             io.to(roomCode).emit('game_started')
             io.to(roomCode).emit('prompt', generatePrompt(roomCode))
             setTimeout(() => {
-                io.to(roomCode).emit('display_reveal_responses', Object.keys(roomHosts[roomCode].responses))
-                io.to(roomCode).emit('player_reveal_responses', Object.keys(roomHosts[roomCode].responses))
+                io.to(roomCode).emit(
+                    'display_reveal_responses',
+                    Object.keys(roomHosts[roomCode].responses)
+                )
+                io.to(roomCode).emit(
+                    'player_reveal_responses',
+                    Object.keys(roomHosts[roomCode].responses)
+                )
                 setTimeout(() => {
-                    io.to(roomCode).emit('display_votes', { responses: roomHosts[roomCode].responses })
+                    io.to(roomCode).emit('display_votes', {
+                        responses: roomHosts[roomCode].responses
+                    })
                 }, 60000)
             }, 60000)
         })
@@ -105,7 +121,6 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
         })
 
         socket.on('player_prompt_response', (payload: any) => {
-
             socket.emit('display_prompt_response', {
                 ...payload,
                 name: roomHosts[payload.code].players[socket.id]

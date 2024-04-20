@@ -1,11 +1,13 @@
 import { useState } from 'react'
 
-function Responses({ responses }){
-
-    return(
+function Responses({ players }) {
+    return (
         <>
-            {responses.map((response) => {
-                <div className='response'>{response}</div>
+            {players.map((players) => {
+                ;<div className="response-box">
+                    <div className="response">{players.response}</div>
+                    <div>{players.player ?? ''}</div>
+                </div>
             })}
         </>
     )

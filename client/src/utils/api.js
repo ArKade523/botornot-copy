@@ -1,40 +1,42 @@
-import { io } from 'socket.io-client';
-import { createContext } from 'react';
+import { io } from 'socket.io-client'
+import { createContext } from 'react'
 
 export class Api {
-    constructor(url){
-        console.log("Constructor");
-        this.socket = io(url ? url : null);
-    };
-
-    getSocket(){
-        return this.socket;
+    constructor(url) {
+        console.log('Constructor')
+        this.socket = io(url ? url : null)
     }
 
-    sendMessage(type, message){
-        console.log("Send Message: type: ", type, " Message: ", message);
-        this.socket.emit(type, message);
+    getSocket() {
+        return this.socket
+    }
+
+    sendMessage(type, message) {
+        console.log('Send Message: type: ', type, ' Message: ', message)
+        this.socket.emit(type, message)
     }
 
     //PLAYER SEND METHODS
-    joinRoom(name, code){
-        this.sendMessage('join_room', {code: code, name: name});
+    joinRoom(name, code) {
+        this.sendMessage('join_room', { code: code, name: name })
     }
 
-    hostStartGame(){
-        this.sendMessage('host_start_game');
+    hostStartGame() {
+        this.sendMessage('host_start_game')
     }
 
-    sendResponse(response){
-        this.sendMessage('player_prompt_response', response);
+    sendResponse(response) {
+        this.sendMessage('player_prompt_response', response)
+    }
+
+    vote(response){
+        this.sendMessage('player_submit_vote', response)
     }
 
     //DISPLAY METHODS
-    createRoom(){
-        this.sendMessage('create_room');
+    createRoom() {
+        this.sendMessage('create_room')
     }
-
-
 }
 
-export const ApiContext = createContext();
+export const ApiContext = createContext()

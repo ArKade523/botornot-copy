@@ -1,37 +1,20 @@
-import { useState } from 'react'
-import Input from '../components/Input'
-import Responses from '../components/Responses';
-import useApi from '../utils/api';
+import Players from '../components/Players'
 
-function Display() {
-  const api = useApi('localhost:3000');
-  const [code, setCode] = useState(undefined);
-  const [prompt, setPrompt] = useState('Welcome to Bot-or-Not');
-  const [responses, setResponses] = useState(["Hello", "World"]);
-  const [bot, setBot] = useState(undefined);
-  const [best, setBest] = useState(undefined);
-
-  useEffect(() => {
-    socket = api.socket();
-
-    socket.on('display_code', (res) => {
-      console.log(res.code);
-      setCode(res.code);
-    })
-    
-    
-  }, []);
-
-  return (
-    <>
-      {(prompt !== undefined) && <h3 className='prompt'>prompt</h3>}
-      {(code !== undefined) && <h3 className='code'>code</h3>}
-      <Input operation={'display'}></Input>
-      <Responses responses={responses}></Responses>
-      {(bot !== undefined) && <h2 className='bot-response'>{bot}</h2>}
-      {(best !== undefined) && <h2 className='best-response'>{best}</h2>}
-    </>
-  )
+function Display({ code, players }) {
+    return (
+        <>
+            <p>
+                In this game, you will all respond to prompts pretending to be bots. One of the
+                responses will be from a real bot. Earn points by fooling your friends and finding
+                the actual bot.
+            </p>
+            <div className="code-div">
+                <p>Go to domain and click Join Game. Enter the code when prompted</p>
+                <h3 className="code">{code}</h3>
+            </div>
+            <Players players={players}></Players>
+        </>
+    )
 }
 
 export default Display
