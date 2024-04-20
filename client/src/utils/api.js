@@ -3,7 +3,7 @@ import { createContext } from 'react'
 
 export class Api {
     constructor(url) {
-        console.log('Constructor')
+        // console.log('Constructor')
         this.socket = io(url ? url : null)
     }
 
@@ -16,8 +16,9 @@ export class Api {
     }
 
     sendMessage(type, message) {
-        console.log('Send Message: type: ', type, ' Message: ', {...message, roomCode: this.code})
-        this.socket.emit(type, {...message, roomCode: this.code})
+        const payload = { ...message, roomCode: this.code };
+        // console.log('Send Message: type: ', type, ' Message: ', payload)
+        this.socket.emit(type, payload)
     }
 
     //PLAYER SEND METHODS

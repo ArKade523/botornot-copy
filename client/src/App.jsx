@@ -32,22 +32,22 @@ function App() {
         const socket = api.getSocket()
 
         socket.on('display_code', (res) => {
-            console.log(res.code)
+            // console.log(res.code)
             setCode(res.code)
         })
 
         socket.on('display_player_join', (res) => {
-            console.log(res)
+            // console.log(res)
             setPlayers((players) => [...players, res.name])
         })
 
         socket.on('game_started', () => {
-            console.log('Game Started')
+            // console.log('Game Started')
             setMode('introduction')
         })
 
         socket.on('prompt', (res) => {
-            console.log("prompt response ", res)
+            // console.log("prompt response ", res)
             setPromp(res)
             if (isDisplay.current) {
                 setMode('submitted')
@@ -58,25 +58,25 @@ function App() {
         })
 
         // socket.on('display_prompt_response', (res) => {
-        //     console.log(res)
+            // console.log(res)
         //     setPlayers(
         //         [...players, { player: res.player, response: res.response }]
         //     )
-        //     console.log("prompt_response", players)
+            // console.log("prompt_response", players)
         // })
 
         // socket.on('display_reveal_responses', (res) => {
-        //     console.log(res.bot_response)
-        //     console.log("Players, ", players)
+            // console.log(res.bot_response)
+            // console.log("Players, ", players)
         //     setPlayers(
         //         [...players, { player: 'bot ', response: res.bot_response}]
         //     )
-        //     console.log(players)
+            console.log(players)
         //     setMode('guess')
         // })
 
         socket.on('display_votes', (res) => {
-            console.log(res)
+            // console.log(res)
             setMode('votes');
             setVotes(res)
                 //[{res.response, res.votes}]
@@ -84,32 +84,32 @@ function App() {
         })
 
         socket.on('display_final_scores', (res) => {
-            console.log(res)
+            // console.log(res)
             setMode('scores')
             setScores(res)
         })
 
         //Player Screen
         socket.on('join_room', (res) => {
-            console.log(res)
+            // console.log(res)
         })
 
         socket.on('join_room_validation', (res) => {
-            console.log(res)
-            console.log(res.code);
+            // console.log(res)
+            // console.log(res.code);
             api.setCode(res.code);
             setHost(res.host)
             setMode('host')
         })
 
         socket.on('player_reveal_responses', (res) => {
-            console.log(res)
+            // console.log(res)
             setMode('choose')
             setResponses(res)
         })
 
         socket.on('player_points', (res) => {
-            console.log(res)
+            // console.log(res)
             setMode('points')
             setPoints((points) => points + res.points)
         })
