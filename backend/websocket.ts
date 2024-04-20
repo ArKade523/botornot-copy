@@ -184,7 +184,7 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                     votes: responsesObject[key].votes
                 }))
 
-                socket.emit('display_votes', { responses: responsesArray })
+                io.to(roomCode).emit('display_votes', { responses: responsesArray })
                 for (const playerID in Object.keys(roomHosts[roomCode].players)) {
                     io.to(playerID).emit('player_points', {
                         player: roomHosts[roomCode].players[playerID].name,
