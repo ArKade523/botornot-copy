@@ -13,6 +13,24 @@ import Choose from './screens/Choose'
 import { useApi } from './hooks/useApi'
 
 import logo_image from './../../images/logo.svg'
+import wait_song from './../../images/circuit-interlude.mp3'
+
+function AudioPlayer({ src, play }) {
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    // Check if we should play the audio
+    if (play) {
+      audioRef.current.play().catch(error => {
+        console.error("Playback error:", error);
+        // Handle error here, such as by showing UI feedback
+      });
+    }
+  }, [play]); // Depend on the `play` prop to decide when to play the audio
+
+  return <audio ref={audioRef} src={src} preload="auto" />;
+}
+
 
 function App() {
     const [mode, setMode] = useState('start')
@@ -123,6 +141,8 @@ function App() {
 
     return (
         <>
+            <AudioPlayer src={wait_song} play={mode === 'submitted'} />
+
             <div className="header">
                 <div id="logo-div" className="logo-box">
                     <img className="logo-img" src={logo_image} />
