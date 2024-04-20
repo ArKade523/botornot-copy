@@ -13,7 +13,7 @@ import {
 const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResponse>) => {
     const io = new SocketIOServer(server)
     const roomHosts: RoomMap = {}
-    const numRounds = 4
+    const numRounds = 1
     let roundNum = 0
     let numVotes = 0
 
