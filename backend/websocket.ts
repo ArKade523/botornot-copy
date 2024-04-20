@@ -168,7 +168,7 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
             } as displayPromptResponse)
         })
 
-        socket.on('player_submit_vote', (response: string, roomCode: string) => {
+        socket.on('player_submit_vote', ({response, roomCode} : {response: string, roomCode: string}) => {
             roomHosts[roomCode].responses[response].votes++
             if (roomHosts[roomCode].responses[response].isBot) {
                 roomHosts[roomCode].players[socket.id].points += 200
