@@ -16,6 +16,7 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
     const numRounds = 1
     let roundNum = 0
     let numVotes = 0
+    const socketRoomMap: { [key: string]: string } = {}
 
     // Generate a random prompt from the list
     const generatePrompt = (roomCode: string) => {
@@ -52,6 +53,9 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                 responses: {}
             } // Store the host's socket ID
 
+            if (roomCode)
+                socketRoomMap[socket.id] = roomCode
+
             console.log("Created roomHost[roomCode]")
 
             io.to(roomCode).emit('display_code', { code: roomCode })
@@ -61,6 +65,8 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
 
         socket.on('join_room', (payload: joinRoomPayload) => {
             socket.join(payload.code)
+            if (payload.code)
+                socketRoomMap[socket.id] = payload.code
             roomHosts[payload.code].players[socket.id] = {
                 name: payload.name,
                 id: socket.id,
@@ -94,11 +100,16 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
         })
 
         socket.on('host_start_game', async (payload: {roomCode: string}) => {
-            const roomCode = payload.roomCode
+            const roomCode = socketRoomMap[socket.id]
+            // console.log(roomCode)
             roomHosts[roomCode].responses = {}
             io.to(roomCode).emit('game_started')
             const prompt = generatePrompt(roomCode)
-            io.to(roomCode).emit('prompt', prompt)
+
+            setTimeout(() => {
+                io.to(roomCode).emit('prompt', prompt)
+            }, 8000)
+
             const gptResponse = await requestGPTResponse(prompt)
             if (gptResponse) {
                 roomHosts[roomCode].responses[gptResponse] = {
@@ -138,8 +149,8 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
                         io.to(roomCode).emit('display_votes', {
                             responses: responseArray
                         })
-                    }, 15000)
-                }, 15000)
+                    }, 20000)
+                }, 38000)
                 roundNum++
             } else {
                 let playerScores: { player: string; points: number }[] = []
@@ -161,6 +172,9 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
         })
 
         socket.on('player_prompt_response', ({response, roomCode} : {response: string, roomCode: string}) => {
+            if (!roomCode) {
+                roomCode = socketRoomMap[socket.id]
+            }
             roomHosts[roomCode].players[socket.id].responses.push(response)
             roomHosts[roomCode].responses[response] = {
                 round: roundNum,
@@ -175,10 +189,22 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
         })
 
         socket.on('player_submit_vote', ({response, roomCode} : {response: string, roomCode: string}) => {
+            if (!roomCode) {
+                roomCode = socketRoomMap[socket.id]
+            }
             console.log(roomHosts[roomCode].responses)
 
             roomHosts[roomCode].responses[response].votes++
             if (roomHosts[roomCode].responses[response].isBot) {
+                if (!roomHosts[roomCode].players[socket.id]) {
+                    roomHosts[roomCode].players[socket.id] = {
+                        name: '',
+                        id: socket.id,
+                        host: false,
+                        responses: [],
+                        points: 0
+                    }
+                }
                 roomHosts[roomCode].players[socket.id].points += 200
             } else {
                 roomHosts[roomCode].players[

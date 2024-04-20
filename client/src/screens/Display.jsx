@@ -4,6 +4,7 @@ function Display({ code, players }) {
     return (
         <div className="join-content">
             <div className="persons">
+                {players.length === 0 && <p className="medium-info">No Players</p>}
                 <Players players={players}></Players>
             </div>
             <div className="join-info">
