@@ -3,17 +3,19 @@ import './App.css'
 import Display from './Display'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [mode, setMode] = setMode("start");
+
 
   return (
     <>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      <Display></Display>
+      <div id='logo-div'>
+        <h1>Bot or Not</h1>
       </div>
+      {(mode === 'start') && <div className='choose-display'>
+        <button onClick={() => setMode("display")}>Create Game</button>
+        <button onClick={() => setMode("player")}>Join Game</button>
+      </div>}
+      <Display></Display>
     </>
   )
 }
