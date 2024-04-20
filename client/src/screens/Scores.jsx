@@ -1,4 +1,5 @@
 function Scores({ scores, host, api }) {
+    console.log("----");
     console.log(scores);
     return (
         <>
@@ -10,7 +11,9 @@ function Scores({ scores, host, api }) {
                     <div className="score">{score.votes}</div>
                 </div>)
         })}
-        {host && <button onClick={() => api.hostStartGame()}>Next Round</button>}
+        {host && <button
+                className="button"
+                onClick={() => api.hostStartGame()}>Next Round</button>}
     </>
     )
 }

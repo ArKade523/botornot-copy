@@ -167,7 +167,7 @@ function App() {
                 {mode === 'choose' && (
                     <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
                 )}
-                {mode === 'votes' && <Scores players={players}></Scores>}
+                {mode === 'votes' && <Scores host={host} api={api} scores={votes.responses}></Scores>}
                 {mode === 'points' && <h2>Your points {points}</h2>}
             </div>
         </>
