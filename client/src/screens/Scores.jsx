@@ -12,7 +12,7 @@ function Scores({ scores, host, api }) {
                         <div className="response-votes-person">
                         <p className="response-votes-person-p">{score.player}</p>
                         </div>
-                        <p class="response-votes-votes">{score.votes} votes</p>
+                        <p className="response-votes-votes">{score.votes} votes</p>
                     </div>
                 </div>)
         })}
