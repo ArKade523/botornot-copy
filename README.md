@@ -17,8 +17,8 @@ sequenceDiagram
         Server ->> Display: Display player join
     end
     Player ->> Server: (Host only) Host start game
-    Server ->> Display: Start game
-    Server ->> Player: Start game
+    Server ->> Display: Game started
+    Server ->> Player: Game started
     loop Every Round
         Note over Server : Create Prompt
         Server ->> Display: Prompt
@@ -98,10 +98,10 @@ Host start game
 }
 ```
 
-Start game
+Game started
 ``` json
 {
-    type: "start_game"
+    type: "game_started"
 }
 ```
 
