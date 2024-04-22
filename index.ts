@@ -4,8 +4,7 @@ import { engine } from 'express-handlebars'
 import fs from 'fs'
 import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
-import { Server as SocketIOServer } from 'socket.io'
-import setupWebSocket from './backend/websocket'
+import { setupWebSockets } from './backend/controllers/roomState_websockets'
 dotenv.config()
 
 const DEBUG = process.env.NODE_ENV !== 'production'
@@ -15,7 +14,7 @@ const MANIFEST: Record<string, any> = DEBUG
 
 const app = express()
 const httpServer = createServer(app)
-const io = setupWebSocket(httpServer)
+const io = setupWebSockets(httpServer)
 
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
@@ -23,7 +22,7 @@ app.set('views', './views')
 app.use(bodyParser.json())
 
 app.use((req, res, next) => {
-    // console.log(`${req.method} ${req.url}`)
+    console.log(`${req.method} ${req.url}`)
     next()
 })
 

@@ -1,7 +1,7 @@
 import { IncomingMessage, Server, ServerResponse } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
-import prompts from './prompts'
-import { requestGPTResponse } from './chatGPT'
+import prompts from './utils/prompts'
+import { requestGPTResponse } from './utils/chatGPT'
 import {
     RoomMap,
     displayPlayerJoin,
@@ -10,7 +10,7 @@ import {
     joinRoomValidation
 } from './types/websockets'
 
-const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResponse>) => {
+const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerResponse>) => {
     const io = new SocketIOServer(server)
     const roomHosts: RoomMap = {}
     const numRounds = 1
@@ -264,4 +264,4 @@ const setupWebSocket = (server: Server<typeof IncomingMessage, typeof ServerResp
     return io
 }
 
-export default setupWebSocket
+export default setupWebSockets
