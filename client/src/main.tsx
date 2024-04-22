@@ -1,8 +1,8 @@
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
+import App from './App.tsx'
 import './index.css'
-import { Api, ApiContext } from './utils/api.js'
+import { Api, ApiContext } from './utils/api.ts'
 
 function Main() {
     const apiRef = useRef(new Api(null))
@@ -14,4 +14,4 @@ function Main() {
     )
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<Main />)
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(<Main />)

@@ -1,6 +1,7 @@
 import { Server, IncomingMessage, ServerResponse } from "http"
 import { Server as SocketIOServer } from 'socket.io'
-import { RoomState, RoomStateManager } from "../repositories/roomState_repository"
+import { RoomStateManager } from "../repositories/roomState_repository"
+import { RoomState } from "../types/types"
 
 export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerResponse>) => {
     const io = new SocketIOServer(server)

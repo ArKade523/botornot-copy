@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { RoomStateManager, RoomState } from "../repositories/roomState_repository"
+import { RoomStateManager } from "../repositories/roomState_repository"
 
 export const roomStateController = () => {
     const router = Router()
