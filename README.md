@@ -48,150 +48,162 @@ sequenceDiagram
 # Message structures
 
 Create room
-``` json
+
+```json
 {
-    type: "create_room"
+    "type": "create_room"
 }
 ```
 
-Display code 
-``` json
+Display code
+
+```json
 {
-    type: "display_code",
-    message: {
-        code: "1A2B"
+    "type": "display_code",
+    "message": {
+        "code": "1A2B"
     }
 }
 ```
 
 Join room
-``` json
+
+```json
 {
-    type: "join_room",
-    message: {
-        code: "1A2B",
-        name: "Johnny"
+    "type": "join_room",
+    "message": {
+        "code": "1A2B",
+        "name": "Johnny"
     }
 }
 ```
 
 Join room validation
-``` json
+
+```json
 {
-    type: "join_room_validation",
-    message: {
-        validCode: true,
-        validName: true,
-        host: true
+    "type": "join_room_validation",
+    "message": {
+        "validCode": true,
+        "validName": true,
+        "host": true
     }
 }
 ```
 
 Display player join
-``` json
+
+```json
 {
-    type: "display_player_join",
-    message: {
-        name: "Johnny",
-        host: true
+    "type": "display_player_join",
+    "message": {
+        "name": "Johnny",
+        "host": true
     }
 }
 ```
 
 Host start game
-``` json
+
+```json
 {
-    type: "host_start_game"
+    "type": "host_start_game"
 }
 ```
 
 Game started
-``` json
+
+```json
 {
-    type: "game_started"
+    "type": "game_started"
 }
 ```
 
 Prompt
-``` json
+
+```json
 {
-    type: "prompt",
-    message: {
-        prompt: "Here is a prompt"
+    "type": "prompt",
+    "message": {
+        "prompt": "Here is a prompt"
     }
 }
 ```
 
 Start timer
-``` json
+
+```json
 {
-    type: "start_timer"
+    "type": "start_timer"
 }
 ```
 
 Player prompt response
-``` json
+
+```json
 {
-    type: "player_prompt_response",
-    message: {
-        response: "Here is a response"
+    "type": "player_prompt_response",
+    "message": {
+        "response": "Here is a response"
     }
 }
 ```
 
 Display prompt response
-``` json
+
+```json
 {
-    type: "display_prompt_response",
-    message: {
-        player: "Johnny",
-        response: "Here is a response"
+    "type": "display_prompt_response",
+    "message": {
+        "player": "Johnny",
+        "response": "Here is a response"
     }
 }
 ```
 
 Display reveal responses
-``` json
+
+```json
 {
-    type: "display_reveal_responses",
-    message: {
-        bot_response: "Here is a bot response"
+    "type": "display_reveal_responses",
+    "message": {
+        "bot_response": "Here is a bot response"
     }
 }
 ```
 
 Player reveal responses
-``` json
+
+```json
 {
-    type: "player_reveal_responses",
-    message: {
-        responses: [
-            "Here is a response",
-            "Here is a bot response"
-        ]
+    "type": "player_reveal_responses",
+    "message": {
+        "responses": ["Here is a response", "Here is a bot response"]
     }
 }
 ```
 
 Player submit vote
-``` json
+
+```json
 {
-    type: "player_submit_vote",
-    message: {
-        response: "Here is a response"
+    "type": "player_submit_vote",
+    "message": {
+        "response": "Here is a response"
     }
 }
 ```
 
 Display votes
-``` json
+
+```json
 {
-    type: "display_votes",
-    message: {
-        responses : [
+    "type": "display_votes",
+    "message": {
+        "responses": [
             {
-                response: "Here is a response",
-                votes: 2
+                "response": "Here is a response",
+                "votes": 2
             }
         ]
     }
@@ -199,24 +211,26 @@ Display votes
 ```
 
 Player points
-``` json
+
+```json
 {
-    type: "player_points",
-    message: {
-        points: 200
+    "type": "player_points",
+    "message": {
+        "points": 200
     }
 }
 ```
 
 Display final scores
-``` json
+
+```json
 {
-    type: "display_final_scores",
-    message: {
-        players: [
+    "type": "display_final_scores",
+    "message": {
+        "players": [
             {
-                player: "Johnny",
-                points: 200
+                "player": "Johnny",
+                "points": 200
             }
         ]
     }
@@ -224,11 +238,12 @@ Display final scores
 ```
 
 Player final score
-``` json
+
+```json
 {
-    type: "player_final_score",
-    message: {
-        points: 200
+    "type": "player_final_score",
+    "message": {
+        "points": 200
     }
 }
 ```

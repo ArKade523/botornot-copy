@@ -3,7 +3,7 @@ import { useApi } from '../hooks/useApi'
 import { PlayerState } from './Player'
 import { toast } from 'react-toastify'
 
-function Join({ setState } : { setState: React.Dispatch<React.SetStateAction<PlayerState>>} ) {
+function Join({ setState }: { setState: React.Dispatch<React.SetStateAction<PlayerState>> }) {
     const [name, setName] = useState('')
     const [roomCode, setRoomCode] = useState('')
     const [codeValid, setCodeValid] = useState(false)
@@ -32,16 +32,14 @@ function Join({ setState } : { setState: React.Dispatch<React.SetStateAction<Pla
 
     return (
         <>
-            <form 
-                className="form"
-                onSubmit={joinRoom}>
+            <form className="form" onSubmit={joinRoom}>
                 <p className="input-desc">Enter name:</p>
                 <input
                     type="text"
                     id="name-input"
                     className="input"
                     value={name}
-                    placeholder='Name'
+                    placeholder="Name"
                     onChange={(e) => setName(e.target.value)}
                     required
                 ></input>
@@ -51,14 +49,11 @@ function Join({ setState } : { setState: React.Dispatch<React.SetStateAction<Pla
                     id="room-code-input"
                     className="input"
                     value={roomCode}
-                    placeholder='Room Code'
+                    placeholder="Room Code"
                     onChange={(e) => setRoomCode(e.target.value)}
                     required
                 ></input>
-                <button
-                    type="submit"
-                    className="button"
-                >
+                <button type="submit" className="button">
                     Enter
                 </button>
             </form>

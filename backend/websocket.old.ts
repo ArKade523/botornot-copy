@@ -53,10 +53,9 @@ const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerRes
                 responses: {}
             } // Store the host's socket ID
 
-            if (roomCode)
-                socketRoomMap[socket.id] = roomCode
+            if (roomCode) socketRoomMap[socket.id] = roomCode
 
-            console.log("Created roomHost[roomCode]")
+            console.log('Created roomHost[roomCode]')
 
             io.to(roomCode).emit('display_code', { code: roomCode })
 
@@ -65,8 +64,7 @@ const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerRes
 
         socket.on('join_room', (payload: joinRoomPayload) => {
             socket.join(payload.code)
-            if (payload.code)
-                socketRoomMap[socket.id] = payload.code
+            if (payload.code) socketRoomMap[socket.id] = payload.code
             roomHosts[payload.code].players[socket.id] = {
                 name: payload.name,
                 id: socket.id,
@@ -99,7 +97,7 @@ const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerRes
             }
         })
 
-        socket.on('host_start_game', async (payload: {roomCode: string}) => {
+        socket.on('host_start_game', async (payload: { roomCode: string }) => {
             const roomCode = socketRoomMap[socket.id]
             // console.log(roomCode)
             roomHosts[roomCode].responses = {}
@@ -130,10 +128,17 @@ const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerRes
 
                     io.to(roomCode).emit('start_timer', { duration: 60 })
                     setTimeout(() => {
-                        let responseArray: { response: string, votes: number, player: string, lastRound: boolean }[] = [];
+                        let responseArray: {
+                            response: string
+                            votes: number
+                            player: string
+                            lastRound: boolean
+                        }[] = []
 
                         // Extracting data from the responses object
-                        for (const [response, details] of Object.entries(roomHosts[roomCode].responses)) {
+                        for (const [response, details] of Object.entries(
+                            roomHosts[roomCode].responses
+                        )) {
                             const playerID = roomHosts[roomCode].responses[response].player_id
                             console.log(roundNum)
                             console.log(numRounds)
@@ -141,9 +146,12 @@ const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerRes
                             responseArray.push({
                                 response: response,
                                 votes: details.votes,
-                                player: playerID === "0" ? "Robot" : roomHosts[roomCode].players[playerID].name,
+                                player:
+                                    playerID === '0'
+                                        ? 'Robot'
+                                        : roomHosts[roomCode].players[playerID].name,
                                 lastRound: roundNum + 1 >= numRounds
-                            });
+                            })
                         }
 
                         io.to(roomCode).emit('display_votes', {
@@ -171,81 +179,87 @@ const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerRes
             }
         })
 
-        socket.on('player_prompt_response', ({response, roomCode} : {response: string, roomCode: string}) => {
-            if (!roomCode) {
-                roomCode = socketRoomMap[socket.id]
+        socket.on(
+            'player_prompt_response',
+            ({ response, roomCode }: { response: string; roomCode: string }) => {
+                if (!roomCode) {
+                    roomCode = socketRoomMap[socket.id]
+                }
+                roomHosts[roomCode].players[socket.id].responses.push(response)
+                roomHosts[roomCode].responses[response] = {
+                    round: roundNum,
+                    votes: 0,
+                    player_id: socket.id,
+                    isBot: false
+                }
+                io.to(roomCode).emit('display_prompt_response', {
+                    player: roomHosts[roomCode].players[socket.id].name,
+                    response
+                } as displayPromptResponse)
             }
-            roomHosts[roomCode].players[socket.id].responses.push(response)
-            roomHosts[roomCode].responses[response] = {
-                round: roundNum,
-                votes: 0,
-                player_id: socket.id,
-                isBot: false
-            }
-            io.to(roomCode).emit('display_prompt_response', {
-                player: roomHosts[roomCode].players[socket.id].name,
-                response
-            } as displayPromptResponse)
-        })
+        )
 
-        socket.on('player_submit_vote', ({response, roomCode} : {response: string, roomCode: string}) => {
-            if (!roomCode) {
-                roomCode = socketRoomMap[socket.id]
-            }
-            console.log(roomHosts[roomCode].responses)
+        socket.on(
+            'player_submit_vote',
+            ({ response, roomCode }: { response: string; roomCode: string }) => {
+                if (!roomCode) {
+                    roomCode = socketRoomMap[socket.id]
+                }
+                console.log(roomHosts[roomCode].responses)
 
-            roomHosts[roomCode].responses[response].votes++
-            if (roomHosts[roomCode].responses[response].isBot) {
-                if (!roomHosts[roomCode].players[socket.id]) {
-                    roomHosts[roomCode].players[socket.id] = {
-                        name: '',
-                        id: socket.id,
-                        host: false,
-                        responses: [],
-                        points: 0
+                roomHosts[roomCode].responses[response].votes++
+                if (roomHosts[roomCode].responses[response].isBot) {
+                    if (!roomHosts[roomCode].players[socket.id]) {
+                        roomHosts[roomCode].players[socket.id] = {
+                            name: '',
+                            id: socket.id,
+                            host: false,
+                            responses: [],
+                            points: 0
+                        }
+                    }
+                    roomHosts[roomCode].players[socket.id].points += 200
+                } else {
+                    roomHosts[roomCode].players[
+                        roomHosts[roomCode].responses[response].player_id
+                    ].points += 100
+                }
+                if (numVotes === Object.keys(roomHosts[roomCode].players).length) {
+                    const responsesObject = roomHosts[roomCode].responses
+                    const responsesArray = Object.keys(responsesObject).map((key) => ({
+                        response: key,
+                        votes: responsesObject[key].votes,
+                        lastRound: roundNum + 1 === numRounds
+                    }))
+
+                    io.to(roomCode).emit('display_votes', { responses: responsesArray })
+                    for (const playerID in Object.keys(roomHosts[roomCode].players)) {
+                        io.to(playerID).emit('player_points', {
+                            player: roomHosts[roomCode].players[playerID].name,
+                            points: roomHosts[roomCode].players[playerID].points
+                        })
                     }
                 }
-                roomHosts[roomCode].players[socket.id].points += 200
-            } else {
-                roomHosts[roomCode].players[
-                    roomHosts[roomCode].responses[response].player_id
-                ].points += 100
             }
-            if (numVotes === Object.keys(roomHosts[roomCode].players).length) {
-                const responsesObject = roomHosts[roomCode].responses
-                const responsesArray = Object.keys(responsesObject).map((key) => ({
-                    response: key,
-                    votes: responsesObject[key].votes,
-                    lastRound: roundNum + 1 === numRounds
-                }))
+        )
 
-                io.to(roomCode).emit('display_votes', { responses: responsesArray })
-                for (const playerID in Object.keys(roomHosts[roomCode].players)) {
-                    io.to(playerID).emit('player_points', {
-                        player: roomHosts[roomCode].players[playerID].name,
-                        points: roomHosts[roomCode].players[playerID].points
-                    })
-                }
-            }
-        })
-
-        socket.on('finish', async (payload: {roomCode: string}) => {
+        socket.on('finish', async (payload: { roomCode: string }) => {
             const roomCode = payload.roomCode
             let playerScores: { player: string; points: number }[] = []
 
-                for (const playerKey in roomHosts[roomCode].players) {
-                    const player = roomHosts[roomCode].players[playerKey]
-                    playerScores.push({ player: player.name, points: player.points })
+            for (const playerKey in roomHosts[roomCode].players) {
+                const player = roomHosts[roomCode].players[playerKey]
+                playerScores.push({ player: player.name, points: player.points })
 
-                    // Send the final scores to the players
-                    io.to(player.id).emit('player_final_score', {
-                        points: player.points
-                    })
-                }
-
-                io.to(roomCode).emit('display_final_scores', {
-                    players: playerScores
+                // Send the final scores to the players
+                io.to(player.id).emit('player_final_score', {
+                    points: player.points
                 })
+            }
+
+            io.to(roomCode).emit('display_final_scores', {
+                players: playerScores
+            })
         })
 
         socket.on('disconnect', () => {

@@ -1,5 +1,5 @@
-import { RoomStateManager } from "../repositories/roomState_repository"
-import prompts from "./prompts"
+import { RoomStateManager } from '../repositories/roomState_repository'
+import prompts from './prompts'
 
 export const getPrompt = (roomCode: string) => {
     const roomStateManager = RoomStateManager.getInstance()
@@ -15,7 +15,7 @@ export const getPrompt = (roomCode: string) => {
 
         return prompts[index]
     }
-    
+
     console.error('Room code not found in getPrompt')
 
     return ''

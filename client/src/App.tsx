@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import logo_image from "../../images/logo.svg";
-import { useApi } from "./hooks/useApi";
-import Display from "./screens/Display";
-import { Player } from "./screens/Player";
-import { ToastContainer, toast } from "react-toastify"
-import 'react-toastify/dist/ReactToastify.css';
+import { useEffect, useState } from 'react'
+import logo_image from '../../images/logo.svg'
+import { useApi } from './hooks/useApi'
+import Display from './screens/Display'
+import { Player } from './screens/Player'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 enum AppState {
     Home,
@@ -17,9 +17,18 @@ export default function App() {
     const api = useApi()
     const socket = api?.getSocket()
 
+    const setDisplay = () => {
+        setState(AppState.Display)
+        if (api?.roomState) {
+            Object.assign(api.roomState, { displayID: socket?.id })
+        }
+
+        api?.createRoom()
+    }
+
     useEffect(() => {
         if (socket) {
-            socket.on('error', ({ message } : { message: string }) => {
+            socket.on('error', ({ message }: { message: string }) => {
                 toast.error(message)
             })
         }
@@ -39,29 +48,24 @@ export default function App() {
             </div>
             <ToastContainer />
             <div className="content home-content">
-                {state === AppState.Home && <>
-                    <button
-                        onClick={() => {
-                            setState(AppState.Display)
-                            api && api.createRoom()
-                        }}
-                        className="button"
-                    >
-                        Create Game
-                    </button>
-                    <button
-                        onClick={() => {
-                            setState(AppState.Player)
-                        }}
-                        className="button"
-                    >
-                        Join Game
-                    </button>
-                </>}
+                {state === AppState.Home && (
+                    <>
+                        <button onClick={setDisplay} className="button">
+                            Create Game
+                        </button>
+                        <button
+                            onClick={() => {
+                                setState(AppState.Player)
+                            }}
+                            className="button"
+                        >
+                            Join Game
+                        </button>
+                    </>
+                )}
                 {state === AppState.Player && <Player />}
                 {state === AppState.Display && <Display />}
             </div>
         </>
     )
-
 }

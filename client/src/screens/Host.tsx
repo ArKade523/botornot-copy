@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { useApi } from "../hooks/useApi"
+import { useEffect, useState } from 'react'
+import { useApi } from '../hooks/useApi'
 
 function Host() {
     const api = useApi()
@@ -8,8 +8,6 @@ function Host() {
     useEffect(() => {
         if (api) {
             const socket = api.getSocket()
-            console.log("Host id: ", api.roomState.hostID)
-            console.log("Socket id: ", socket.id)
             if (api.roomState.hostID === socket.id) {
                 setHost(true)
             }
@@ -20,7 +18,11 @@ function Host() {
         <>
             <p className="medium-info">You're in.</p>
             <p className="medium-info">As soon as all the other players are in, start the game</p>
-            {host && <button className="button" onClick={() => api?.startGame()}>Start Game</button>}
+            {host && (
+                <button className="button" onClick={() => api?.startGame()}>
+                    Start Game
+                </button>
+            )}
         </>
     )
 }

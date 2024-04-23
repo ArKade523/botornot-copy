@@ -1,8 +1,9 @@
-import { Server, IncomingMessage, ServerResponse } from "http"
+import { Server, IncomingMessage, ServerResponse } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
-import { RoomStateManager } from "../repositories/roomState_repository"
-import { RoomState } from "../types/types"
-import { getPrompt } from "../utils/getPrompt"
+import { RoomStateManager } from '../repositories/roomState_repository'
+import { RoomState } from '../types/types'
+import { getPrompt } from '../utils/getPrompt'
+import { requestGPTResponse } from '../utils/chatGPT'
 
 export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerResponse>) => {
     const io = new SocketIOServer(server)
@@ -13,9 +14,9 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
         console.log('A user connected:', socket.id)
 
         socket.on('create_room', () => {
-            let roomCode = Math.random().toString(36).toUpperCase().slice(2, 6) // Generate a simple room code
+            let roomCode = Math.random().toString(36).toUpperCase().slice(2, 6).replace('0', 'O') // Generate a random 4-character room code
             while (roomCode in roomStateManager.getRoomCodes()) {
-                roomCode = Math.random().toString(36).toUpperCase().slice(2, 6)
+                roomCode = Math.random().toString(36).toUpperCase().slice(2, 6).replace('0', 'O')
             }
 
             socket.join(roomCode)
@@ -38,12 +39,14 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
             }
         })
 
-        socket.on('join_room', ({ roomCode, name } : { roomCode: string, name: string }) => {
+        socket.on('join_room', ({ roomCode, name }: { roomCode: string; name: string }) => {
             if (!name) {
                 console.error(`User ${socket.id} tried to join room ${roomCode} without a name`)
                 io.to(socket.id).emit('error', { message: 'Please enter a name' })
                 return
             }
+
+            roomCode.replace('0', 'O') // Replace 0 with O to reduce the chance of confusion
 
             if (!roomCode) {
                 console.error(`User ${socket.id} tried to join room without a room code`)
@@ -98,13 +101,17 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
 
             const roomState = roomStateManager.getRoomState(roomCode)
             if (!roomState) {
-                console.error(`User ${socket.id} tried to start game in nonexistent room ${roomCode}`)
+                console.error(
+                    `User ${socket.id} tried to start game in nonexistent room ${roomCode}`
+                )
                 io.to(socket.id).emit('error', { message: 'Room does not exist' })
                 return
             }
 
             if (roomState.hostID !== socket.id) {
-                console.error(`User ${socket.id} tried to start game in room ${roomCode} without being the host`)
+                console.error(
+                    `User ${socket.id} tried to start game in room ${roomCode} without being the host`
+                )
                 io.to(socket.id).emit('error', { message: 'Only the host can start the game' })
                 return
             }
@@ -113,7 +120,88 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
             io.to(roomCode).emit('game_started')
         })
 
-        socket.on('submit_response', ({ response } : { response: string }) => {
+        socket.on('get_prompt', async () => {
+            const roomCode = roomCodeMap[socket.id]
+            if (!roomCode) {
+                console.error(`User ${socket.id} tried to get prompt without being in a room`)
+                io.to(socket.id).emit('error', { message: 'You are not in a room' })
+                return
+            }
+
+            const roomState = roomStateManager.getRoomState(roomCode)
+            if (!roomState) {
+                console.error(
+                    `User ${socket.id} tried to get prompt in nonexistent room ${roomCode}`
+                )
+                io.to(socket.id).emit('error', { message: 'Room does not exist' })
+                return
+            }
+
+            const prompt = getPrompt(roomCode)
+            io.to(roomCode).emit('display_prompt', { prompt })
+
+            const botResponseString = await requestGPTResponse(prompt)
+
+            if (!botResponseString) {
+                console.error(`Failed to get bot response for prompt: ${prompt}`)
+                io.to(socket.id).emit('error', { message: 'Failed to get bot response' })
+                return
+            }
+
+            const botResponse = {
+                playerID: 'bot',
+                response: botResponseString,
+                votes: 0,
+                round: roomState.round
+            }
+
+            roomState.responses.push(botResponse)
+
+            const botPlayer = roomState.players['bot']
+            if (botPlayer) {
+                botPlayer.responses.push(botResponse)
+            } else {
+                const newBotPlayer = {
+                    name: 'bot',
+                    id: 'bot',
+                    host: false,
+                    responses: [botResponse],
+                    points: 0,
+                    isBot: true
+                }
+                roomState.players['bot'] = newBotPlayer
+            }
+
+            io.to(roomCode).emit('bot_response', { response: botResponseString })
+        })
+
+        socket.on('countdown_seconds', ({ seconds }: { seconds: number }) => {
+            const roomCode = roomCodeMap[socket.id]
+            if (!roomCode) {
+                console.error(
+                    `User ${socket.id} tried to send countdown seconds without being in a room`
+                )
+                io.to(socket.id).emit('error', { message: 'You are not in a room' })
+                return
+            }
+
+            io.to(roomCode).emit('countdown_seconds', { seconds })
+        })
+
+        socket.on('stop_timer', () => {
+            const roomCode = roomCodeMap[socket.id]
+            if (!roomCode) {
+                console.error(`User ${socket.id} tried to stop timer without being in a room`)
+                io.to(socket.id).emit('error', { message: 'You are not in a room' })
+                return
+            }
+
+            console.log(`User ${socket.id} stopped timer in room ${roomCode}`)
+
+            io.to(roomCode).emit('stop_timer')
+        })
+
+        socket.on('submit_response', ({ response }: { response: string }) => {
             const roomCode = roomCodeMap[socket.id]
             if (!roomCode) {
                 console.error(`User ${socket.id} tried to submit response without being in a room`)
@@ -129,36 +217,66 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
 
             const roomState = roomStateManager.getRoomState(roomCode)
             if (!roomState) {
-                console.error(`User ${socket.id} tried to submit response in nonexistent room ${roomCode}`)
+                console.error(
+                    `User ${socket.id} tried to submit response in nonexistent room ${roomCode}`
+                )
                 io.to(socket.id).emit('error', { message: 'Room does not exist' })
                 return
             }
 
             const player = roomState.players[socket.id]
             if (!player) {
-                console.error(`User ${socket.id} tried to submit response without being in the room`)
+                console.error(
+                    `User ${socket.id} tried to submit response without being in the room`
+                )
                 io.to(socket.id).emit('error', { message: 'You are not in this room' })
                 return
             }
 
             const newResponse = {
-                player,
+                playerID: socket.id,
                 response,
                 votes: 0,
                 round: roomState.round
             }
 
             player.responses.push(newResponse)
+            roomState.responses.push(newResponse)
 
             if (!roomStateManager.setRoomState(roomCode, roomState)) {
                 console.error(`Failed to update room state for room ${roomCode}`)
                 io.to(socket.id).emit('error', { message: 'Failed to submit response' })
                 return
             }
-            
+
+            io.to(roomState.displayID).emit('response_submitted', { playerID: player.id, response })
+            console.log(`User ${socket.id} submitted response in room ${roomCode}`)
+            io.to(roomCode).emit('player_response_submitted', { response })
         })
 
-        socket.on('submit_vote', ({ response } : { response: string }) => {
+        socket.on('all_responses_submitted', () => {
+            const roomCode = roomCodeMap[socket.id]
+            if (!roomCode) {
+                console.error(
+                    `User ${socket.id} tried to submit all responses without being in a room`
+                )
+                io.to(socket.id).emit('error', { message: 'You are not in a room' })
+                return
+            }
+
+            const roomState = roomStateManager.getRoomState(roomCode)
+            if (!roomState) {
+                console.error(
+                    `User ${socket.id} tried to submit all responses in nonexistent room ${roomCode}`
+                )
+                io.to(socket.id).emit('error', { message: 'Room does not exist' })
+                return
+            }
+
+            io.to(roomCode).emit('all_responses_submitted')
+        })
+
+        socket.on('submit_vote', ({ response }: { response: string }) => {
             const roomCode = roomCodeMap[socket.id]
             if (!roomCode) {
                 console.error(`User ${socket.id} tried to submit vote without being in a room`)
@@ -175,7 +293,9 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
             const roomState = roomStateManager.getRoomState(roomCode)
 
             if (!roomState) {
-                console.error(`User ${socket.id} tried to submit vote in nonexistent room ${roomCode}`)
+                console.error(
+                    `User ${socket.id} tried to submit vote in nonexistent room ${roomCode}`
+                )
                 io.to(socket.id).emit('error', { message: 'Room does not exist' })
                 return
             }
@@ -188,49 +308,17 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
                 return
             }
 
-            const responsePlayer = roomState.players[response]
+            const responseObj = roomState.responses.find((r) => r.response === response)
 
-            if (!responsePlayer) {
-                console.error(`User ${socket.id} tried to vote for nonexistent player ${response}`)
-                io.to(socket.id).emit('error', { message: 'Player does not exist' })
-                return
-            }
-
-            const responseIndex = player.responses.findIndex((r) => r.player.id === response)
-
-            if (responseIndex === -1) {
-                console.error(`User ${socket.id} tried to vote for response that doesn't exist`)
+            if (!responseObj) {
+                console.error(`User ${socket.id} tried to submit vote for nonexistent response`)
                 io.to(socket.id).emit('error', { message: 'Response does not exist' })
                 return
             }
 
-            player.responses[responseIndex].votes++
+            responseObj.votes++
 
-            if (!roomStateManager.setRoomState(roomCode, roomState)) {
-                console.error(`Failed to update room state for room ${roomCode}`)
-                io.to(socket.id).emit('error', { message: 'Failed to submit vote' })
-                return
-            }
-        })
-
-        socket.on('get_prompt', () => {
-            const roomCode = roomCodeMap[socket.id]
-            if (!roomCode) {
-                console.error(`User ${socket.id} tried to get prompt without being in a room`)
-                io.to(socket.id).emit('error', { message: 'You are not in a room' })
-                return
-            }
-
-            const roomState = roomStateManager.getRoomState(roomCode)
-            if (!roomState) {
-                console.error(`User ${socket.id} tried to get prompt in nonexistent room ${roomCode}`)
-                io.to(socket.id).emit('error', { message: 'Room does not exist' })
-                return
-            }
-
-            const prompt = getPrompt(roomCode)
-            io.to(socket.id).emit('display_prompt', { prompt })
-        
+            io.to(roomState.displayID).emit('vote_submitted', { playerID: player.id, response })
         })
 
         socket.on('disconnect', () => {
@@ -251,8 +339,7 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
                     io.to(roomCode).emit('player_left', { players: roomState.players })
                 }
             }
-        })        
-
+        })
     })
 
     return io

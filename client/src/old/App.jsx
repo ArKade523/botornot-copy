@@ -17,21 +17,20 @@ import logo_image from './../../images/logo.svg'
 import wait_song from './../../images/circuit-interlude.mp3'
 
 function AudioPlayer({ src, play }) {
-  const audioRef = useRef(null);
+    const audioRef = useRef(null)
 
-  useEffect(() => {
-    // Check if we should play the audio
-    if (play) {
-      audioRef.current.play().catch(error => {
-        console.error("Playback error:", error);
-        // Handle error here, such as by showing UI feedback
-      });
-    }
-  }, [play]); // Depend on the `play` prop to decide when to play the audio
+    useEffect(() => {
+        // Check if we should play the audio
+        if (play) {
+            audioRef.current.play().catch((error) => {
+                console.error('Playback error:', error)
+                // Handle error here, such as by showing UI feedback
+            })
+        }
+    }, [play]) // Depend on the `play` prop to decide when to play the audio
 
-  return <audio ref={audioRef} src={src} preload="auto" />;
+    return <audio ref={audioRef} src={src} preload="auto" />
 }
-
 
 function App() {
     const [mode, setMode] = useState('start')
@@ -77,28 +76,28 @@ function App() {
         })
 
         // socket.on('display_prompt_response', (res) => {
-            // console.log(res)
+        // console.log(res)
         //     setPlayers(
         //         [...players, { player: res.player, response: res.response }]
         //     )
-            // console.log("prompt_response", players)
+        // console.log("prompt_response", players)
         // })
 
         // socket.on('display_reveal_responses', (res) => {
-            // console.log(res.bot_response)
-            // console.log("Players, ", players)
+        // console.log(res.bot_response)
+        // console.log("Players, ", players)
         //     setPlayers(
         //         [...players, { player: 'bot ', response: res.bot_response}]
         //     )
-            console.log(players)
+        console.log(players)
         //     setMode('guess')
         // })
 
         socket.on('display_votes', (res) => {
             // console.log(res)
-            setMode('votes');
+            setMode('votes')
             setVotes(res)
-                //[{res.response, res.votes}]
+            //[{res.response, res.votes}]
             //Make this interactive??
         })
 
@@ -116,7 +115,7 @@ function App() {
         socket.on('join_room_validation', (res) => {
             // console.log(res)
             // console.log(res.code);
-            api.setCode(res.code);
+            api.setCode(res.code)
             setHost(res.host)
             setMode('host')
         })
@@ -130,7 +129,7 @@ function App() {
         socket.on('player_final_scores', (res) => {
             console.log(res)
             setMode('points')
-            if(!isDisplay.current){
+            if (!isDisplay.current) {
                 setPoints(res)
             }
         })
@@ -151,7 +150,6 @@ function App() {
             socket.off('player_reveal_responses')
             socket.off('player_points')
         }
-
     }, [])
 
     return (
@@ -194,15 +192,21 @@ function App() {
                 {mode === 'awnsers' && <Awnsers prompt={promp} players={players}></Awnsers>}
                 {mode === 'scores' && <Scores players={players}></Scores>}
 
-
                 {mode === 'join' && <Join api={api}></Join>}
                 {mode === 'host' && <Host host={host} api={api}></Host>}
                 {mode === 'enter' && <Enter promp={promp} api={api} setMode={setMode}></Enter>}
                 {mode === 'wait' && <h1>WAIT!</h1>}
                 {mode === 'choose' && (
-                    <Choose prompt={promp} responses={responses} api={api} setMode={setMode}></Choose>
+                    <Choose
+                        prompt={promp}
+                        responses={responses}
+                        api={api}
+                        setMode={setMode}
+                    ></Choose>
                 )}
-                {mode === 'votes' && <Scores host={host} api={api} scores={votes.responses}></Scores>}
+                {mode === 'votes' && (
+                    <Scores host={host} api={api} scores={votes.responses}></Scores>
+                )}
                 {mode === 'points' && <Points players={points.players}></Points>}
             </div>
         </>

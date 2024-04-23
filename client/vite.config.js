@@ -11,6 +11,6 @@ export default defineConfig({
         },
         outDir: '../dist/static',
         cssMinify: false,
-        minify: false,
+        minify: false
     }
 })

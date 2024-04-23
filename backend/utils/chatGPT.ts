@@ -15,13 +15,13 @@ export const requestGPTResponse = async (message: string) => {
         'Sound like Shakespeare',
         'Answer with exactly one word, all lowercase',
         'Sound like an inmate',
-        'Sound like you are a duck pretending to be a human',
+        'Sound like you are a duck pretending to be a human'
     ]
 
     const tone = tones[Math.floor(Math.random() * tones.length)]
 
-    console.log("Tone: " + tone)
-    
+    console.log('Tone: ' + tone)
+
     const completion = await openai.chat.completions.create({
         messages: [
             {
@@ -30,7 +30,7 @@ export const requestGPTResponse = async (message: string) => {
                     'You are attempting to blend in with humans responding to this prompt. \
                     Try to answer in a way that a human would. \
                     Use a short response. Do not provide an explanation. \
-                    Give an answer that would not be expected of an AI.'+ tone
+                    Give an answer that would not be expected of an AI.' + tone
             },
             { role: 'user', content: message }
         ],

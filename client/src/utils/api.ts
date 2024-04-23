@@ -1,7 +1,6 @@
 import { io } from 'socket.io-client'
 import { createContext } from 'react'
-import { RoomState } from '../types/types'
-
+import { RoomState, Response } from '../types/types'
 
 export class Api {
     private socket: any
@@ -14,28 +13,72 @@ export class Api {
         round: 0,
         responses: []
     }
-    private listeners: (() => void)[] = [];
+    private listeners: (() => void)[] = []
 
     constructor(url: string | null = null) {
         // console.log('Constructor')
         this.socket = io(url || '')
 
-        this.socket.on('display_code', ( { roomCode } : { roomCode: string } ) => {
+        this.socket.on('display_code', ({ roomCode }: { roomCode: string }) => {
             Object.assign(this.roomState, { roomCode })
             this.notify()
         })
 
-        this.socket.on('player_joined', ( { players } : { players: Record<string, any> } ) => {
+        this.socket.on('player_joined', ({ players }: { players: Record<string, any> }) => {
             for (const player in players) {
                 if (players[player].host) {
                     Object.assign(this.roomState, { hostID: players[player].id })
                 }
             }
-            Object.assign(this.roomState, { players })
+            this.roomState.players = players
             this.notify()
             console.log('Player Joined: ', players)
         })
 
+        this.socket.on('bot_response', ({ response }: { response: string }) => {
+            const botPlayer = Object.values(this.roomState.players).find((player) => player.isBot)
+            if (!botPlayer) {
+                const newBotPlayer = {
+                    id: 'bot',
+                    name: 'bot',
+                    host: false,
+                    responses: [],
+                    points: 0,
+                    isBot: true
+                }
+                this.roomState.players['bot'] = newBotPlayer
+            }
+
+            const botResponse: Response = {
+                response,
+                playerID: 'bot',
+                votes: 0,
+                round: this.roomState.round
+            }
+
+            this.roomState.responses.push(botResponse)
+            this.notify()
+        })
+
+        this.socket.on(
+            'response_submitted',
+            ({ response, playerID }: { response: string; playerID: string }) => {
+                const newResponse: Response = {
+                    response,
+                    playerID: playerID,
+                    votes: 0,
+                    round: this.roomState.round
+                }
+                this.roomState.responses.push(newResponse)
+                this.notify()
+            }
+        )
+
+        this.socket.on('vote_submitted', ({ response }: { response: string; playerID: string }) => {
+            const responseIndex = this.roomState.responses.findIndex((r) => r.response === response)
+            this.roomState.responses[responseIndex].votes++
+            this.notify()
+        })
     }
 
     destructor() {
@@ -43,7 +86,7 @@ export class Api {
     }
 
     private notify() {
-        this.listeners.forEach(listener => listener())
+        this.listeners.forEach((listener) => listener())
     }
 
     subscribe(listener: () => void) {
@@ -51,7 +94,7 @@ export class Api {
     }
 
     unsubscribe(listener: () => void) {
-        this.listeners = this.listeners.filter(l => l !== listener)
+        this.listeners = this.listeners.filter((l) => l !== listener)
     }
 
     getSocket() {
@@ -59,21 +102,29 @@ export class Api {
     }
 
     setRoomCode(code: string) {
-        this.roomState.roomCode = code;
+        this.roomState.roomCode = code
     }
 
     isHost() {
         return this.roomState.hostID === this.socket.id
     }
 
+    isDisplay() {
+        return this.roomState.displayID === this.socket.id
+    }
+
     sendMessage(type: string, message: any = {}) {
-        const payload = { ...message, roomCode: this.roomState.roomCode };
+        const payload = { ...message, roomCode: this.roomState.roomCode }
         console.log('Send Message: type: ', type, ' Message: ', payload)
         this.socket.emit(type, payload)
     }
 
     getPrompt() {
         this.sendMessage('get_prompt')
+    }
+
+    getResponseStrings(): string[] {
+        return this.roomState.responses.map((response) => response.response).sort()
     }
 
     //PLAYER SEND METHODS
@@ -87,11 +138,11 @@ export class Api {
     }
 
     submitResponse(response: string) {
-        this.sendMessage('submit_response', {response})
+        this.sendMessage('submit_response', { response })
     }
 
     vote(response: string) {
-        this.sendMessage('submit_vote', {response})
+        this.sendMessage('submit_vote', { response })
     }
 
     finish() {
