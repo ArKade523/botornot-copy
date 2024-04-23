@@ -1,1 +1,25 @@
-/Users/kadeangell/Code/repos/bot-or-not/backend/types/types.d.ts
+export interface RoomState {
+    roomCode: string;
+    players: Record<string, Player>;
+    displayID: string;
+    hostID: string;
+    usedPrompts: number[];
+    round: number;
+    responses: Response[];
+}
+
+export interface Player {
+    name: string;
+    id: string;
+    host: boolean;
+    responses: Response[];
+    points: number;
+    isBot: boolean;
+}
+
+export interface Response {
+    player: Player;
+    response: string;
+    votes: number;
+    round: number;
+}

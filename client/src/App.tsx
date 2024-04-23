@@ -1,4 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import logo_image from "../../images/logo.svg";
+import { useApi } from "./hooks/useApi";
+import Display from "./screens/Display";
+import { Player } from "./screens/Player";
+import { ToastContainer, toast } from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css';
 
 enum AppState {
     Home,
@@ -8,12 +14,53 @@ enum AppState {
 
 export default function App() {
     const [state, setState] = useState(AppState.Home)
+    const api = useApi()
+    const socket = api?.getSocket()
+
+    useEffect(() => {
+        if (socket) {
+            socket.on('error', ({ message } : { message: string }) => {
+                toast.error(message)
+            })
+        }
+
+        return () => {
+            socket?.off('error')
+        }
+    }, [socket])
 
     return (
         <>
-            {state === AppState.Home && <h1>Home</h1>}
-            {state === AppState.Display && <h1>Display</h1>}
-            {state === AppState.Player && <h1>Player</h1>}
+            <div className="header">
+                <div id="logo-div" className="logo-box">
+                    <img className="logo-img" src={logo_image} />
+                    <h1 className="logo-h1">Bot or Not</h1>
+                </div>
+            </div>
+            <ToastContainer />
+            <div className="content home-content">
+                {state === AppState.Home && <>
+                    <button
+                        onClick={() => {
+                            setState(AppState.Display)
+                            api && api.createRoom()
+                        }}
+                        className="button"
+                    >
+                        Create Game
+                    </button>
+                    <button
+                        onClick={() => {
+                            setState(AppState.Player)
+                        }}
+                        className="button"
+                    >
+                        Join Game
+                    </button>
+                </>}
+                {state === AppState.Player && <Player />}
+                {state === AppState.Display && <Display />}
+            </div>
         </>
     )
 

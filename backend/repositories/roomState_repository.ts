@@ -23,6 +23,10 @@ export class RoomStateManager {
         return Object.keys(this.rooms);
     }
 
+    public getUsedPrompts(roomId: string): number[] | undefined {
+        return this.rooms[roomId]?.usedPrompts;
+    }
+
     public setRoomState(roomId: string, state: RoomState): boolean {
         this.rooms[roomId] = state;
         return true;

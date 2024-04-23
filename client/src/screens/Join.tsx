@@ -1,17 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useApi } from '../hooks/useApi'
+import { PlayerState } from './Player'
+import { toast } from 'react-toastify'
 
-function Join({ api }) {
+function Join({ setState } : { setState: React.Dispatch<React.SetStateAction<PlayerState>>} ) {
     const [name, setName] = useState('')
     const [roomCode, setRoomCode] = useState('')
+    const [codeValid, setCodeValid] = useState(false)
+    const api = useApi()
+    const socket = api?.getSocket()
+
+    const joinRoom = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        api?.joinRoom(name, roomCode)
+    }
+
+    useEffect(() => {
+        if (socket) {
+            socket.on('join_code_valid', () => {
+                setCodeValid(true)
+            })
+        }
+    }, [socket])
+
+    useEffect(() => {
+        if (codeValid) {
+            toast.success('Code Valid')
+            setState(PlayerState.HOST)
+        }
+    }, [codeValid])
 
     return (
         <>
             <form 
                 className="form"
-                onSubmit={ (e) => {
-                e.preventDefault()
-                api.joinRoom(name, roomCode)
-            }}>
+                onSubmit={joinRoom}>
                 <p className="input-desc">Enter name:</p>
                 <input
                     type="text"
@@ -20,6 +43,7 @@ function Join({ api }) {
                     value={name}
                     placeholder='Name'
                     onChange={(e) => setName(e.target.value)}
+                    required
                 ></input>
                 <p className="input-desc">Enter code:</p>
                 <input
@@ -29,6 +53,7 @@ function Join({ api }) {
                     value={roomCode}
                     placeholder='Room Code'
                     onChange={(e) => setRoomCode(e.target.value)}
+                    required
                 ></input>
                 <button
                     type="submit"

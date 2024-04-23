@@ -2,6 +2,7 @@ import { Server, IncomingMessage, ServerResponse } from "http"
 import { Server as SocketIOServer } from 'socket.io'
 import { RoomStateManager } from "../repositories/roomState_repository"
 import { RoomState } from "../types/types"
+import { getPrompt } from "../utils/getPrompt"
 
 export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerResponse>) => {
     const io = new SocketIOServer(server)
@@ -31,7 +32,7 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
 
             if (roomStateManager.setRoomState(roomCode, roomState)) {
                 console.log(`Room created with code: ${roomCode}, host ID: ${socket.id}`)
-                io.to(socket.id).emit('display_code', { code: roomCode })
+                io.to(socket.id).emit('display_code', { roomCode: roomCode })
             } else {
                 console.error(`Failed to create room with code: ${roomCode}`)
             }
@@ -50,7 +51,7 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
                 return
             }
 
-            if (roomCode in roomStateManager.getRoomCodes()) {
+            if (roomStateManager.getRoomCodes().includes(roomCode)) {
                 socket.join(roomCode)
                 roomCodeMap[socket.id] = roomCode
                 console.log(`User ${socket.id} joined room ${roomCode}`)
@@ -75,6 +76,8 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
                 if (host) {
                     roomState.hostID = socket.id
                 }
+
+                io.to(socket.id).emit('join_code_valid')
 
                 roomStateManager.setRoomState(roomCode, roomState)
 
@@ -208,6 +211,26 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
                 io.to(socket.id).emit('error', { message: 'Failed to submit vote' })
                 return
             }
+        })
+
+        socket.on('get_prompt', () => {
+            const roomCode = roomCodeMap[socket.id]
+            if (!roomCode) {
+                console.error(`User ${socket.id} tried to get prompt without being in a room`)
+                io.to(socket.id).emit('error', { message: 'You are not in a room' })
+                return
+            }
+
+            const roomState = roomStateManager.getRoomState(roomCode)
+            if (!roomState) {
+                console.error(`User ${socket.id} tried to get prompt in nonexistent room ${roomCode}`)
+                io.to(socket.id).emit('error', { message: 'Room does not exist' })
+                return
+            }
+
+            const prompt = getPrompt(roomCode)
+            io.to(socket.id).emit('display_prompt', { prompt })
+        
         })
 
         socket.on('disconnect', () => {
