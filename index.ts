@@ -14,7 +14,7 @@ const MANIFEST: Record<string, any> = DEBUG
 
 const app = express()
 const httpServer = createServer(app)
-const io = setupWebSockets(httpServer)
+setupWebSockets(httpServer)
 
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
@@ -23,6 +23,10 @@ app.use(bodyParser.json())
 
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`)
+    if (req.url.includes('undefined')) {
+        console.log('Undefined in URL: Is your .env set up?')
+    }
+    
     next()
 })
 
@@ -43,8 +47,8 @@ console.log(MANIFEST)
 app.get('/', (req, res) => {
     res.render('index', {
         debug: DEBUG,
-        jsBundle: DEBUG ? '' : MANIFEST['src/main.jsx']['file'],
-        cssBundle: DEBUG ? '' : MANIFEST['src/main.jsx']['css'][0],
+        jsBundle: DEBUG ? '' : MANIFEST['src/main.tsx']['file'],
+        cssBundle: DEBUG ? '' : MANIFEST['src/main.tsx']['css'][0],
         assetUrl: process.env.ASSET_URL,
         layout: false
     })
