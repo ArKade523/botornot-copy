@@ -23,3 +23,8 @@ export interface Response {
     votes: number
     round: number
 }
+
+declare module "*.svg" {
+    const content: any;
+    return content;
+}
