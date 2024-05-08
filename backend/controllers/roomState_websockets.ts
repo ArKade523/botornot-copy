@@ -5,6 +5,11 @@ import { RoomState } from '../types/types'
 import { getPrompt } from '../utils/getPrompt'
 import { requestGPTResponse } from '../utils/chatGPT'
 
+enum POINTS {
+    VOTED_FOR = 100,
+    GUESSED_BOT = 200
+}
+
 export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof ServerResponse>) => {
     const io = new SocketIOServer(server)
     const roomStateManager = RoomStateManager.getInstance()
@@ -264,15 +269,6 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
                 return
             }
 
-            const roomState = roomStateManager.getRoomState(roomCode)
-            if (!roomState) {
-                console.error(
-                    `User ${socket.id} tried to submit all responses in nonexistent room ${roomCode}`
-                )
-                io.to(socket.id).emit('error', { message: 'Room does not exist' })
-                return
-            }
-
             io.to(roomCode).emit('all_responses_submitted')
         })
 
@@ -317,8 +313,27 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
             }
 
             responseObj.votes++
+            const votedPlayer = roomState.players[responseObj.playerID]
+            votedPlayer.points += POINTS.VOTED_FOR;
+            console.log(`User ${socket.id} voted for response in room ${roomCode}`)
 
+            player.points += responseObj.playerID === "bot" ? POINTS.GUESSED_BOT : 0
+            
+            io.to(socket.id).emit('vote_submitted', { response })
             io.to(roomState.displayID).emit('vote_submitted', { playerID: player.id, response })
+        })
+
+        socket.on('all_votes_submitted', () => {
+            const roomCode = roomCodeMap[socket.id]
+            if (!roomCode) {
+                console.error(
+                    `User ${socket.id} tried to submit all votes without being in a room`
+                )
+                io.to(socket.id).emit('error', { message: 'You are not in a room' })
+                return
+            }
+
+            io.to(roomCode).emit('all_votes_submitted')
         })
 
         socket.on('disconnect', () => {

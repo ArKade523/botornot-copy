@@ -10,7 +10,8 @@ enum DisplayState {
     JOIN,
     INTRODUCTION,
     PROMPT,
-    VOTE
+    VOTE,
+    RESULTS
 }
 
 function Display() {
@@ -41,6 +42,10 @@ function Display() {
 
             socket.on('all_responses_submitted', () => {
                 setState(DisplayState.VOTE)
+            })
+
+            socket.on('all_votes_submitted', () => {
+                setState(DisplayState.RESULTS)
             })
         }
 

@@ -36,12 +36,18 @@ export function Player() {
             socket.on('all_responses_submitted', () => {
                 setState(PlayerState.VOTE)
             })
+
+            socket.on('vote_submitted', ({ response }: { response: string }) => {
+                console.log('vote_submitted', response)
+                setState(PlayerState.WAIT)
+            })
         }
 
         return () => {
             socket?.off('game_started')
             socket?.off('display_prompt')
             socket?.off('all_responses_submitted')
+            socket?.off('vote_submitted')
         }
     }, [socket])
 

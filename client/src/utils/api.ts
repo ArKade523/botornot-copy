@@ -77,6 +77,9 @@ export class Api {
         this.socket.on('vote_submitted', ({ response }: { response: string; playerID: string }) => {
             const responseIndex = this.roomState.responses.findIndex((r) => r.response === response)
             this.roomState.responses[responseIndex].votes++
+            if (this.roomState.responses.every((r) => r.votes === Object.keys(this.roomState.players).length - 1)) {
+                this.sendMessage('all_votes_submitted')
+            }
             this.notify()
         })
     }
