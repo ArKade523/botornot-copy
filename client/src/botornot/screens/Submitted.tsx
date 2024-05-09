@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useApi } from '../hooks/useApi'
-import useCountdownTimer from '../hooks/useCountdownTimer'
+import { useApi } from '../../hooks/useApi'
+import useCountdownTimer from '../../hooks/useCountdownTimer'
 
 function Submitted({ prompt }: { prompt: string }) {
     const api = useApi()

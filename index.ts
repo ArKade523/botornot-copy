@@ -5,6 +5,10 @@ import fs from 'fs'
 import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
 import { setupWebSockets } from './backend/controllers/roomState_websockets'
+import { buildUsersController } from './backend/controllers/users_controller'
+import { buildSessionsController } from './backend/controllers/sessions_controller'
+import { UsersRepository } from './backend/repositories/users_repository'
+import { PrismaClient } from '@prisma/client'
 dotenv.config()
 
 const DEBUG = process.env.NODE_ENV !== 'production'
@@ -13,6 +17,8 @@ const MANIFEST: Record<string, any> = DEBUG
     : JSON.parse(fs.readFileSync('dist/static/.vite/manifest.json').toString())
 
 const app = express()
+const db = new PrismaClient()
+const usersRepository = UsersRepository.getInstance(db)
 const httpServer = createServer(app)
 setupWebSockets(httpServer)
 
@@ -41,6 +47,9 @@ if (!DEBUG) {
         }
     })
 }
+
+app.use('/users', buildUsersController(usersRepository))
+app.use('/sessions', buildSessionsController(db))
 
 console.log(MANIFEST)
 

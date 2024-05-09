@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useApi } from '../hooks/useApi'
+import { useApi } from '../../hooks/useApi'
 import { PlayerState } from './Player'
 import { toast } from 'react-toastify'
 

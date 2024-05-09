@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useApi } from '../hooks/useApi'
-import useCountdownTimer from '../hooks/useCountdownTimer'
+import { useApi } from '../../hooks/useApi'
+import useCountdownTimer from '../../hooks/useCountdownTimer'
 
 function Vote({ prompt }: { prompt: string }) {
     const { seconds, resetTimer } = useCountdownTimer(20)

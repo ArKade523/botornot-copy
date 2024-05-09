@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Join from './Join'
 import Host from './Host'
-import { useApi } from '../hooks/useApi'
+import { useApi } from '../../hooks/useApi'
 import Introduction from './Introduction'
 import Enter from './Enter'
 import Vote from './Vote'

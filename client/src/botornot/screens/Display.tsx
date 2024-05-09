@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Players from '../components/Players'
-import { useApi } from '../hooks/useApi'
+import { useApi } from '../../hooks/useApi'
 import { Player } from '../types/types'
 import Introduction from './Introduction'
 import Submitted from './Submitted'

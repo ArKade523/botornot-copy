@@ -1,10 +1,12 @@
 import { io } from 'socket.io-client'
 import { createContext } from 'react'
-import { RoomState, Response } from '../types/types'
+import { RoomState, Response } from '../botornot/types/types'
 
 const NUM_ROUNDS = 3
 
 export class Api {
+    authToken: string | null = null
+
     private socket: any
     roomState: RoomState = {
         roomCode: '',
@@ -17,7 +19,7 @@ export class Api {
     }
     private listeners: (() => void)[] = []
 
-    constructor(url: string | null = null) {
+    constructor(url: string | null = null, initialToken: string | null = null) {
         // console.log('Constructor')
         this.socket = io(url || '')
 
@@ -90,6 +92,42 @@ export class Api {
             }
             this.notify()
         })
+
+        this.authToken = initialToken
+    }
+
+    async makeRequest(url: string, method: string, body?: any) {
+        const options = {} as any
+        if (method === 'POST' || method === 'PUT') {
+            options.body = JSON.stringify(body)
+        }
+
+        const res = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: this.authToken ? `Bearer ${this.authToken}` : ''
+            },
+            ...options
+        })
+
+        return res.json()
+    }
+
+    get(url: string) {
+        return this.makeRequest(url, 'GET')
+    }
+
+    post(url: string, body: any) {
+        return this.makeRequest(url, 'POST', body)
+    }
+
+    put(url: string, body: any) {
+        return this.makeRequest(url, 'PUT', body)
+    }
+
+    delete(url: string) {
+        return this.makeRequest(url, 'DELETE')
     }
 
     destructor() {
@@ -151,7 +189,9 @@ export class Api {
     }
 
     getFullRoundResponses(): Response[] {
-        return this.roomState.responses.filter((response) => response.round === this.roomState.round)
+        return this.roomState.responses.filter(
+            (response) => response.round === this.roomState.round
+        )
     }
 
     //PLAYER SEND METHODS

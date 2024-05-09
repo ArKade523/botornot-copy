@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import Loading from '../components/Loading'
 import { useNavigate } from 'react-router-dom'
-import { useApi } from '../hooks/useApi'
+import { useApi } from '../../hooks/useApi'
 import { useDispatch } from 'react-redux'
-import { setToken } from '../slices/authSlice'
+import { setToken } from '../../slices/authSlice'
 
 function Register() {
     const [firstName, setFirstName] = useState('')
@@ -18,7 +18,7 @@ function Register() {
     const registerUser = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
-        const { token } = await api.post('/users', {
+        const { token } = await api?.post('/users', {
             firstName: firstName,
             lastName: lastName,
             email,
