@@ -269,6 +269,17 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
                 return
             }
 
+            const roomState = roomStateManager.getRoomState(roomCode)
+            if (!roomState) {
+                console.error(
+                    `User ${socket.id} tried to submit all responses in nonexistent room ${roomCode}`
+                )
+                io.to(socket.id).emit('error', { message: 'Room does not exist' })
+                return
+            }
+
+            roomState.round++
+
             io.to(roomCode).emit('all_responses_submitted')
         })
 

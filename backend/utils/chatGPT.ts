@@ -15,7 +15,7 @@ export const requestGPTResponse = async (message: string) => {
         'Sound like Shakespeare',
         'Answer with exactly one word, all lowercase',
         'Sound like an inmate',
-        'Sound like you are a duck pretending to be a human'
+        'Sound like a fortune cookie'
     ]
 
     const tone = tones[Math.floor(Math.random() * tones.length)]
@@ -35,7 +35,7 @@ export const requestGPTResponse = async (message: string) => {
             { role: 'user', content: message }
         ],
         model: 'gpt-4-turbo',
-        temperature: 0.9
+        temperature: 0.95
     })
 
     return completion.choices[0].message.content

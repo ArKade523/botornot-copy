@@ -27,7 +27,7 @@ function Submitted({ prompt }: { prompt: string }) {
     useEffect(() => {
         if (api) {
             if (
-                api.roomState.responses.length === Object.keys(api.roomState.players).length ||
+                api.getResponseStrings().length === Object.keys(api.roomState.players).length ||
                 seconds === 0
             ) {
                 socket.emit('all_responses_submitted')

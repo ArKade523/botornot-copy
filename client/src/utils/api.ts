@@ -2,6 +2,8 @@ import { io } from 'socket.io-client'
 import { createContext } from 'react'
 import { RoomState, Response } from '../types/types'
 
+const NUM_ROUNDS = 3
+
 export class Api {
     private socket: any
     roomState: RoomState = {
@@ -69,6 +71,8 @@ export class Api {
                     votes: 0,
                     round: this.roomState.round
                 }
+                console.log('Response Submitted: ', newResponse)
+
                 this.roomState.responses.push(newResponse)
                 this.notify()
             }
@@ -116,6 +120,10 @@ export class Api {
         return this.roomState.displayID === this.socket.id
     }
 
+    isLastRound() {
+        return this.roomState.round === NUM_ROUNDS
+    }
+
     sendMessage(type: string, message: any = {}) {
         const payload = { ...message, roomCode: this.roomState.roomCode }
         console.log('Send Message: type: ', type, ' Message: ', payload)
@@ -127,7 +135,10 @@ export class Api {
     }
 
     getResponseStrings(): string[] {
-        return this.roomState.responses.map((response) => response.response).sort()
+        // return the responses for this round only
+        return this.roomState.responses
+            .filter((response) => response.round === this.roomState.round)
+            .map((response) => response.response).sort()
     }
 
     //PLAYER SEND METHODS
@@ -138,6 +149,11 @@ export class Api {
 
     startGame() {
         this.sendMessage('start_game')
+    }
+
+    nextRound() {
+        this.roomState.round++
+        this.sendMessage('get_prompt')
     }
 
     submitResponse(response: string) {

@@ -18,6 +18,7 @@ function Enter({
         e.preventDefault()
         console.log('Submit response: ', response)
         api?.submitResponse(response)
+        setResponse('')
         setState(PlayerState.WAIT)
     }
 

@@ -5,6 +5,7 @@ import { useApi } from '../hooks/useApi'
 import Introduction from './Introduction'
 import Enter from './Enter'
 import Vote from './Vote'
+import Results from './Results'
 
 export enum PlayerState {
     JOIN,
@@ -12,7 +13,8 @@ export enum PlayerState {
     INTRODUCTION,
     RESPOND,
     WAIT,
-    VOTE
+    VOTE,
+    RESULTS
 }
 
 export function Player() {
@@ -41,6 +43,10 @@ export function Player() {
                 console.log('vote_submitted', response)
                 setState(PlayerState.WAIT)
             })
+
+            socket.on('all_votes_submitted', () => {
+                setState(PlayerState.RESULTS)
+            })
         }
 
         return () => {
@@ -48,6 +54,7 @@ export function Player() {
             socket?.off('display_prompt')
             socket?.off('all_responses_submitted')
             socket?.off('vote_submitted')
+            socket?.off('all_votes_submitted')
         }
     }, [socket])
 
@@ -61,6 +68,7 @@ export function Player() {
             )}
             {state === PlayerState.WAIT && <p>WAIT</p>}
             {state === PlayerState.VOTE && <Vote prompt={prompt ? prompt : ''} />}
+            {state === PlayerState.RESULTS && <Results />}
         </>
     )
 }

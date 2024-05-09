@@ -5,6 +5,7 @@ import { Player } from '../types/types'
 import Introduction from './Introduction'
 import Submitted from './Submitted'
 import Vote from './Vote'
+import Results from './Results'
 
 enum DisplayState {
     JOIN,
@@ -53,6 +54,7 @@ function Display() {
             socket?.off('game_started')
             socket?.off('display_prompt')
             socket?.off('all_responses_submitted')
+            socket?.off('all_votes_submitted')
         }
     }, [socket])
 
@@ -85,6 +87,7 @@ function Display() {
                 </>
             )}
             {state === DisplayState.VOTE && <Vote prompt={prompt ? prompt : ''} />}
+            {state === DisplayState.RESULTS && <Results />}
         </>
     )
 }
