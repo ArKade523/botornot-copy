@@ -325,11 +325,11 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
 
             responseObj.votes++
             const votedPlayer = roomState.players[responseObj.playerID]
-            votedPlayer.points += POINTS.VOTED_FOR;
+            votedPlayer.points += POINTS.VOTED_FOR
             console.log(`User ${socket.id} voted for response in room ${roomCode}`)
 
-            player.points += responseObj.playerID === "bot" ? POINTS.GUESSED_BOT : 0
-            
+            player.points += responseObj.playerID === 'bot' ? POINTS.GUESSED_BOT : 0
+
             io.to(socket.id).emit('vote_submitted', { response })
             io.to(roomState.displayID).emit('vote_submitted', { playerID: player.id, response })
         })
@@ -337,9 +337,7 @@ export const setupWebSockets = (server: Server<typeof IncomingMessage, typeof Se
         socket.on('all_votes_submitted', () => {
             const roomCode = roomCodeMap[socket.id]
             if (!roomCode) {
-                console.error(
-                    `User ${socket.id} tried to submit all votes without being in a room`
-                )
+                console.error(`User ${socket.id} tried to submit all votes without being in a room`)
                 io.to(socket.id).emit('error', { message: 'You are not in a room' })
                 return
             }

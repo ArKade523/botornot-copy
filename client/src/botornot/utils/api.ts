@@ -81,7 +81,11 @@ export class Api {
         this.socket.on('vote_submitted', ({ response }: { response: string; playerID: string }) => {
             const responseIndex = this.roomState.responses.findIndex((r) => r.response === response)
             this.roomState.responses[responseIndex].votes++
-            if (this.roomState.responses.every((r) => r.votes === Object.keys(this.roomState.players).length - 1)) {
+            if (
+                this.roomState.responses.every(
+                    (r) => r.votes === Object.keys(this.roomState.players).length - 1
+                )
+            ) {
                 this.sendMessage('all_votes_submitted')
             }
             this.notify()
@@ -138,7 +142,16 @@ export class Api {
         // return the responses for this round only
         return this.roomState.responses
             .filter((response) => response.round === this.roomState.round)
-            .map((response) => response.response).sort()
+            .map((response) => response.response)
+            .sort()
+    }
+
+    getFullResponses(): Response[] {
+        return this.roomState.responses
+    }
+
+    getFullRoundResponses(): Response[] {
+        return this.roomState.responses.filter((response) => response.round === this.roomState.round)
     }
 
     //PLAYER SEND METHODS

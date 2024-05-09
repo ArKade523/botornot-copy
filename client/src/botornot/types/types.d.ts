@@ -24,7 +24,7 @@ export interface Response {
     round: number
 }
 
-declare module "*.svg" {
-    const content: any;
-    return content;
+declare module '*.svg' {
+    const content: any
+    return content
 }

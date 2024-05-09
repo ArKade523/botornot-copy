@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react"
-import { useApi } from "../hooks/useApi"
+import { useEffect, useState } from 'react'
+import { useApi } from '../hooks/useApi'
 
 function Results() {
     const api = useApi()
     const host = api?.isHost()
     const lastRound = api?.isLastRound()
-    const [scores, setScores] = useState<{ response: string, votes: number, playerName: string }[] | undefined>(undefined)
+    const [scores, setScores] = useState<
+        { response: string; votes: number; playerName: string }[] | undefined
+    >(undefined)
 
     useEffect(() => {
         if (api) {
-            const retrievedScores = api.roomState.responses.map((response) => {
+            const retrievedScores = api.getFullRoundResponses().map((response) => {
                 return {
                     response: response.response,
                     votes: response.votes,
@@ -35,7 +37,7 @@ function Results() {
                             </div>
                         </div>
                     )
-            })}
+                })}
             {lastRound ? (
                 <button className="button" onClick={() => api?.finish()}>
                     Finish Game

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import logo_image from '../../images/logo.svg'
+import logo_image from '../../../images/logo.svg'
 import { useApi } from './hooks/useApi'
 import Display from './screens/Display'
 import { Player } from './screens/Player'

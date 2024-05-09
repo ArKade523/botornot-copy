@@ -26,7 +26,7 @@ app.use((req, res, next) => {
     if (req.url.includes('undefined')) {
         console.log('Undefined in URL: Is your .env set up?')
     }
-    
+
     next()
 })
 

@@ -33,7 +33,6 @@ function Submitted({ prompt }: { prompt: string }) {
                 socket.emit('all_responses_submitted')
             }
         }
-
     }, [seconds, socket])
 
     return (
